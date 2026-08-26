@@ -243,6 +243,66 @@
       ja: '{thing}じゃ ありません！{other}です。{name}は 「え〜！」と 言[い]います。' }
   ];
 
+  /* ---------- Story skeletons ----------
+   * Metadata for the picker in Setup. The actual beat logic for each lives
+   * in story.js (Story.prototype.buildCompareBeat / buildJourneyBeat /
+   * buildMysteryBeat); "classic" is the original want→fail→fail→help shape. */
+  var SKELETONS = [
+    { id: 'classic', icon: '😣', name: 'こまりごと',
+      en: 'Wants something, fails twice, resolved with help — the original shape' },
+    { id: 'compare', icon: '⚖️', name: 'どちらが いい？',
+      en: 'Compares two options, then commits to one' },
+    { id: 'journey', icon: '🧭', name: '３つの よてい',
+      en: 'Three stops in a row, each with its own little twist' },
+    { id: 'mystery', icon: '🔍', name: 'なぞの じけん',
+      en: 'Interviews three suspects, then makes an accusation' }
+  ];
+
+  /* ---------- "Compare" skeleton cards ---------- */
+  /* build(ctx) gets {opt} for the option just introduced. */
+  var COMPARE_TRAITS = [
+    { id: 'expensive', icon: '💸', en: '…but it’s expensive!', ja: 'でも、{opt}は ちょっと たかいです。' },
+    { id: 'far', icon: '🚶', en: '…but it’s far away!', ja: 'でも、{opt}は とおくに あります。' },
+    { id: 'popular', icon: '⭐', en: '…and it’s very popular!', ja: 'そして、{opt}は とても にんきです！' },
+    { id: 'rare', icon: '🦄', en: '…but it’s hard to find!', ja: 'でも、{opt}は みつけにくいです。' },
+    { id: 'perfect', icon: '💯', en: '…it’s perfect!', ja: 'そして、{opt}は かんぺきです！' },
+    { id: 'boring', icon: '😐', en: '…a little boring, though.', ja: 'でも、{opt}は ちょっと つまらないです。' }
+  ];
+
+  var COMPARE_OUTCOMES = [
+    { id: 'happy', icon: '🎉', kind: 'happy', en: 'Very happy with the choice!',
+      ja: '{name}は {winner}に します。だいまんぞくです！' },
+    { id: 'both', icon: '🤹', kind: 'happy', en: 'Gets both, somehow!',
+      ja: 'けっきょく、{name}は りょうほう えらびました！' },
+    { id: 'regret', icon: '😅', kind: 'twist', en: 'A little regret creeps in.',
+      ja: '{name}は {winner}に しました。でも、ちょっと こうかいして います。' },
+    { id: 'swap', icon: '🔄', kind: 'twist', en: 'Changes their mind at the last second!',
+      ja: 'でも、さいごに {other}に かえました！' }
+  ];
+
+  /* ---------- "Journey" skeleton cards ---------- */
+  /* build(ctx) gets {place}. Deliberately not failures - upbeat or neutral,
+   * each resolved on the spot rather than carried forward. */
+  var JOURNEY_EVENTS = [
+    { icon: '🌂', en: 'It rains, but you find shelter.', ja: '{place}で あめが ふりましたが、やねの したで やすみました。' },
+    { icon: '🐕', en: 'A friendly dog says hello!', ja: '{place}で かわいい 犬が あいさつを しました！' },
+    { icon: '🎶', en: 'You hear some nice music.', ja: '{place}で すてきな おんがくが きこえました。' },
+    { icon: '👋', en: 'You bump into an old friend!', ja: '{place}で ふるい 友だちに ぐうぜん あいました！' },
+    { icon: '🍬', en: 'Someone gives you a sweet.', ja: '{place}で だれかが あめを くれました。' },
+    { icon: '⏰', en: 'You are running a little late.', ja: '{place}で ちょっと おくれて しまいました。' }
+  ];
+
+  /* ---------- "Mystery" skeleton cards ---------- */
+  /* Suspects' own statements - first-person, no slot needed. */
+  var MYSTERY_CLUES = [
+    { icon: '🕐', en: '"I was at the library all day."', ja: '「わたしは いちにちじゅう としょかんに いました。」' },
+    { icon: '🍰', en: '"I was eating cake at home."', ja: '「わたしは うちで ケーキを たべて いました。」' },
+    { icon: '😅', en: '"I… don’t remember anything!"', ja: '「わたしは・・・ 何[なに]も おぼえて いません！」' },
+    { icon: '👀', en: '"I saw someone strange near there."', ja: '「そこの ちかくで へんな 人[ひと]を 見[み]ました。」' },
+    { icon: '🤫', en: '"I have nothing to say."', ja: '「なにも 言[い]う ことは ありません。」' },
+    { icon: '😊', en: '"I would never do such a thing!"', ja: '「わたしは そんな ことは しません！」' }
+  ];
+
   /* ---------- Backdrops: place -> scene kind ---------- */
   /* Every place word that ships in a built-in pack gets its own dedicated
    * backdrop (see art.js SETS) rather than being bucketed with others -
@@ -390,6 +450,11 @@
     NAMES: NAMES,
     OBSTACLES: OBSTACLES,
     ENDINGS: ENDINGS,
+    SKELETONS: SKELETONS,
+    COMPARE_TRAITS: COMPARE_TRAITS,
+    COMPARE_OUTCOMES: COMPARE_OUTCOMES,
+    JOURNEY_EVENTS: JOURNEY_EVENTS,
+    MYSTERY_CLUES: MYSTERY_CLUES,
     sceneKindFor: sceneKindFor,
     guessIcon: guessIcon,
     moodFor: moodFor

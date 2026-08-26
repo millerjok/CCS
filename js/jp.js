@@ -57,6 +57,17 @@
       no:     function (x) { return J('いいえ、', x, 'じゃ ありません。'); },
       en:     function (s, x) { return 'Their name is ' + x + '.'; }
     },
+    missing: {
+      cat: 'things', qWord: 'なに',
+      say:    function (s, x) { return J(x, 'が ありません。'); },
+      askYN:  function (s, x) { return J(x, 'が ありませんか。'); },
+      askOr:  function (s, a, b) { return J(a, 'が ありませんか、', b, 'が ありませんか。'); },
+      askWh:  function (s) { return J('何[なに]が ありませんか。'); },
+      pick:   function (x) { return J(x, 'が ありません'); },
+      yes:    function (x) { return J('はい、', x, 'が ありません。'); },
+      no:     function (x) { return J('いいえ、', x, 'が あります。'); },
+      en:     function (s, x) { return x + ' is missing.'; }
+    },
     isAt: {
       cat: 'places', qWord: 'どこ',
       say:    function (s, x) { return J(s, 'は ', x, 'に います。'); },

@@ -15,6 +15,7 @@ const R = CCS.ruby;
 
 const RUNS = parseInt(process.argv[2], 10) || 40;
 const LEVELS = ['minimal', 'light', 'normal', 'heavy'];
+const SKELETONS = ['classic', 'compare', 'journey', 'mystery'];
 let failures = 0, stories = 0, totalLines = 0, totalQuestions = 0, minReps = Infinity;
 
 function check(where, text) {
@@ -25,44 +26,47 @@ function check(where, text) {
 }
 
 CCS.data.PRESETS.forEach(function (preset) {
-  LEVELS.forEach(function (level) {
-    for (let run = 0; run < RUNS; run++) {
-      const story = new CCS.Story(JSON.parse(JSON.stringify(preset.config)), { circling: level });
-      let step = story.advance(), guard = 0;
-      while (step && guard++ < 2000) {
-        if (step.kind === 'choose') {
-          const opt = step.options[Math.floor(Math.random() * step.options.length)];
-          check(preset.id + '/' + level + ' choice', R.text(opt.tk));
-          check(preset.id + '/' + level + ' question', R.text(step.q));
-          step = story.answer(opt);
-          continue;
+  SKELETONS.forEach(function (skeleton) {
+    LEVELS.forEach(function (level) {
+      var label = preset.id + '/' + skeleton + '/' + level;
+      for (let run = 0; run < RUNS; run++) {
+        const story = new CCS.Story(JSON.parse(JSON.stringify(preset.config)), { circling: level, skeleton: skeleton });
+        let step = story.advance(), guard = 0;
+        while (step && guard++ < 2000) {
+          if (step.kind === 'choose') {
+            const opt = step.options[Math.floor(Math.random() * step.options.length)];
+            check(label + ' choice', R.text(opt.tk));
+            check(label + ' question', R.text(step.q));
+            step = story.answer(opt);
+            continue;
+          }
+          if (step.kind === 'circle') {
+            step.questions.forEach(function (q) {
+              check(label + ' prompt', R.text(q.prompt));
+              check(label + ' echo', R.text(q.echo));
+              q.choices.forEach(function (c) { check(label + ' answer', R.text(c.tk)); });
+              if (!q.choices.some(function (c) { return c.correct; })) {
+                console.error('  ✗ question with no correct answer: ' + R.text(q.prompt));
+                failures++;
+              }
+              story.score(true);
+              totalQuestions++;
+            });
+          }
+          if (step.kind === 'say') check(label + ' line', R.text(step.tk));
+          if (step.kind === 'recap') break;
+          step = story.advance();
         }
-        if (step.kind === 'circle') {
-          step.questions.forEach(function (q) {
-            check(preset.id + '/' + level + ' prompt', R.text(q.prompt));
-            check(preset.id + '/' + level + ' echo', R.text(q.echo));
-            q.choices.forEach(function (c) { check(preset.id + ' answer', R.text(c.tk)); });
-            if (!q.choices.some(function (c) { return c.correct; })) {
-              console.error('  ✗ question with no correct answer: ' + R.text(q.prompt));
-              failures++;
-            }
-            story.score(true);
-            totalQuestions++;
-          });
+        if (guard >= 2000) { console.error('  ✗ story never finished: ' + label); failures++; }
+        if (story.st.script.length < 12) {
+          console.error('  ✗ story too short (' + label + '): ' + story.st.script.length + ' lines');
+          failures++;
         }
-        if (step.kind === 'say') check(preset.id + '/' + level + ' line', R.text(step.tk));
-        if (step.kind === 'recap') break;
-        step = story.advance();
+        stories++;
+        totalLines += story.st.script.length;
+        minReps = Math.min(minReps, story.st.reps);
       }
-      if (guard >= 2000) { console.error('  ✗ story never finished'); failures++; }
-      if (story.st.script.length < 15) {
-        console.error('  ✗ story too short: ' + story.st.script.length + ' lines');
-        failures++;
-      }
-      stories++;
-      totalLines += story.st.script.length;
-      minReps = Math.min(minReps, story.st.reps);
-    }
+    });
   });
 });
 

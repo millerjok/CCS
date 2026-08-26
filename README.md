@@ -82,16 +82,45 @@ The recap prints the whole story the class made. ぜんぶ きく reads it aloud
 
 ---
 
-## The skeleton
+## Story shapes
 
-Fixed on purpose — the shape is what makes the language repeat.
+Each shape is fixed on purpose — a rigid sequence of decisions is what makes
+the language repeat. Pick one in Setup step 2; any word pack works with any
+shape. All four are built from the same machinery (decide → hear it circled
+back → move on), so switching shapes mid-lesson with the same pack is safe.
 
-| Beat | What happens | Structures the class hears |
-|---|---|---|
-| ① | A character **wants** something | `〜が ほしいです`, `〜は 〜です` |
-| ② | Goes somewhere → **fails** | `〜に 行きます`, `〜が ありません` |
-| ③ | Goes somewhere else → **fails again** | the same, plus `とても 〜です` |
-| ④ | Someone **helps** → resolution | `〜が てつだいます`, `〜を あげます` |
+**こまりごと (classic)** — the original shape. A character wants something,
+goes looking for it twice and fails both times, then someone helps.
+
+| Beat | What happens |
+|---|---|
+| ① | A character **wants** something |
+| ② | Goes somewhere → **fails** |
+| ③ | Goes somewhere else → **fails again** |
+| ④ | Someone **helps** → resolution |
+
+**どちらが いい？ (compare)** — two options get introduced one at a time,
+each with a pro/con twist, then the class commits to a winner and finds out
+how it turns out.
+
+**３つの よてい (journey)** — three stops in a row. Nothing carries forward
+as a failure; each stop gets its own small (mostly upbeat) event resolved on
+the spot, so the tone is episodic rather than cumulative.
+
+**なぞの じけん (mystery)** — something goes missing. The class interviews
+three suspects (one is secretly guilty, decided at random) and guesses
+"suspicious or not" for each — scored against who actually did it — before
+a detective makes the final accusation.
+
+Whichever shape is picked, the same three target-structure boxes from step 3
+get recited through the story — twice each for the two "attempt"-style
+skeletons (classic, compare), across the three stops or three suspects for
+the others. Write target structures that suit the shape you're using: a
+`{ばしょ}に 行きます` target written for classic will still work under
+compare, but it'll get filled with a random place having nothing to do with
+the comparison — grammatically fine, just a bonus rep rather than a plot
+point. That's true of classic's own targets too whenever a mismatch happens;
+it's normal, not a bug.
 
 ---
 

@@ -358,7 +358,13 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     </div>
 
     <div class="card">
-      <h2><span class="num">2</span>Target grammar</h2>
+      <h2><span class="num">2</span>Story shape</h2>
+      <div class="sub">The skeleton the class's decisions get poured into. All four are built the same way underneath — decide, hear it circled back, move on.</div>
+      <div class="presets" id="skeletons"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">3</span>Target grammar</h2>
       <div class="sub">
         The 2–3 structures you want the class to hear again and again. Put a slot in curly brackets —
         <code>{もの}</code>, <code>{ばしょ}</code>, <code>{ひと}</code>, <code>{どうし}</code>, <code>{きもち}</code> —
@@ -372,7 +378,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     </div>
 
     <div class="card">
-      <h2><span class="num">3</span>Vocabulary</h2>
+      <h2><span class="num">4</span>Vocabulary</h2>
       <div class="sub">
         These are the choices the class picks from. Three or more words per list is plenty —
         fewer words means more repetition, which is exactly what you want with Years 7–9.
@@ -391,7 +397,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     </div>
 
     <div class="card">
-      <h2><span class="num">4</span>Repetition</h2>
+      <h2><span class="num">5</span>Repetition</h2>
       <div class="sub">How many times should each new fact be asked back before the story continues?</div>
       <div class="row">
         <select id="circling" style="max-width:340px">
@@ -832,6 +838,66 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       ja: '{thing}じゃ ありません！{other}です。{name}は 「え〜！」と 言[い]います。' }
   ];
 
+  /* ---------- Story skeletons ----------
+   * Metadata for the picker in Setup. The actual beat logic for each lives
+   * in story.js (Story.prototype.buildCompareBeat / buildJourneyBeat /
+   * buildMysteryBeat); "classic" is the original want→fail→fail→help shape. */
+  var SKELETONS = [
+    { id: 'classic', icon: '😣', name: 'こまりごと',
+      en: 'Wants something, fails twice, resolved with help — the original shape' },
+    { id: 'compare', icon: '⚖️', name: 'どちらが いい？',
+      en: 'Compares two options, then commits to one' },
+    { id: 'journey', icon: '🧭', name: '３つの よてい',
+      en: 'Three stops in a row, each with its own little twist' },
+    { id: 'mystery', icon: '🔍', name: 'なぞの じけん',
+      en: 'Interviews three suspects, then makes an accusation' }
+  ];
+
+  /* ---------- "Compare" skeleton cards ---------- */
+  /* build(ctx) gets {opt} for the option just introduced. */
+  var COMPARE_TRAITS = [
+    { id: 'expensive', icon: '💸', en: '…but it’s expensive!', ja: 'でも、{opt}は ちょっと たかいです。' },
+    { id: 'far', icon: '🚶', en: '…but it’s far away!', ja: 'でも、{opt}は とおくに あります。' },
+    { id: 'popular', icon: '⭐', en: '…and it’s very popular!', ja: 'そして、{opt}は とても にんきです！' },
+    { id: 'rare', icon: '🦄', en: '…but it’s hard to find!', ja: 'でも、{opt}は みつけにくいです。' },
+    { id: 'perfect', icon: '💯', en: '…it’s perfect!', ja: 'そして、{opt}は かんぺきです！' },
+    { id: 'boring', icon: '😐', en: '…a little boring, though.', ja: 'でも、{opt}は ちょっと つまらないです。' }
+  ];
+
+  var COMPARE_OUTCOMES = [
+    { id: 'happy', icon: '🎉', kind: 'happy', en: 'Very happy with the choice!',
+      ja: '{name}は {winner}に します。だいまんぞくです！' },
+    { id: 'both', icon: '🤹', kind: 'happy', en: 'Gets both, somehow!',
+      ja: 'けっきょく、{name}は りょうほう えらびました！' },
+    { id: 'regret', icon: '😅', kind: 'twist', en: 'A little regret creeps in.',
+      ja: '{name}は {winner}に しました。でも、ちょっと こうかいして います。' },
+    { id: 'swap', icon: '🔄', kind: 'twist', en: 'Changes their mind at the last second!',
+      ja: 'でも、さいごに {other}に かえました！' }
+  ];
+
+  /* ---------- "Journey" skeleton cards ---------- */
+  /* build(ctx) gets {place}. Deliberately not failures - upbeat or neutral,
+   * each resolved on the spot rather than carried forward. */
+  var JOURNEY_EVENTS = [
+    { icon: '🌂', en: 'It rains, but you find shelter.', ja: '{place}で あめが ふりましたが、やねの したで やすみました。' },
+    { icon: '🐕', en: 'A friendly dog says hello!', ja: '{place}で かわいい 犬が あいさつを しました！' },
+    { icon: '🎶', en: 'You hear some nice music.', ja: '{place}で すてきな おんがくが きこえました。' },
+    { icon: '👋', en: 'You bump into an old friend!', ja: '{place}で ふるい 友だちに ぐうぜん あいました！' },
+    { icon: '🍬', en: 'Someone gives you a sweet.', ja: '{place}で だれかが あめを くれました。' },
+    { icon: '⏰', en: 'You are running a little late.', ja: '{place}で ちょっと おくれて しまいました。' }
+  ];
+
+  /* ---------- "Mystery" skeleton cards ---------- */
+  /* Suspects' own statements - first-person, no slot needed. */
+  var MYSTERY_CLUES = [
+    { icon: '🕐', en: '"I was at the library all day."', ja: '「わたしは いちにちじゅう としょかんに いました。」' },
+    { icon: '🍰', en: '"I was eating cake at home."', ja: '「わたしは うちで ケーキを たべて いました。」' },
+    { icon: '😅', en: '"I… don’t remember anything!"', ja: '「わたしは・・・ 何[なに]も おぼえて いません！」' },
+    { icon: '👀', en: '"I saw someone strange near there."', ja: '「そこの ちかくで へんな 人[ひと]を 見[み]ました。」' },
+    { icon: '🤫', en: '"I have nothing to say."', ja: '「なにも 言[い]う ことは ありません。」' },
+    { icon: '😊', en: '"I would never do such a thing!"', ja: '「わたしは そんな ことは しません！」' }
+  ];
+
   /* ---------- Backdrops: place -> scene kind ---------- */
   /* Every place word that ships in a built-in pack gets its own dedicated
    * backdrop (see art.js SETS) rather than being bucketed with others -
@@ -979,6 +1045,11 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     NAMES: NAMES,
     OBSTACLES: OBSTACLES,
     ENDINGS: ENDINGS,
+    SKELETONS: SKELETONS,
+    COMPARE_TRAITS: COMPARE_TRAITS,
+    COMPARE_OUTCOMES: COMPARE_OUTCOMES,
+    JOURNEY_EVENTS: JOURNEY_EVENTS,
+    MYSTERY_CLUES: MYSTERY_CLUES,
     sceneKindFor: sceneKindFor,
     guessIcon: guessIcon,
     moodFor: moodFor
@@ -1045,6 +1116,17 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       yes:    function (x) { return J('はい、', x, 'です。'); },
       no:     function (x) { return J('いいえ、', x, 'じゃ ありません。'); },
       en:     function (s, x) { return 'Their name is ' + x + '.'; }
+    },
+    missing: {
+      cat: 'things', qWord: 'なに',
+      say:    function (s, x) { return J(x, 'が ありません。'); },
+      askYN:  function (s, x) { return J(x, 'が ありませんか。'); },
+      askOr:  function (s, a, b) { return J(a, 'が ありませんか、', b, 'が ありませんか。'); },
+      askWh:  function (s) { return J('何[なに]が ありませんか。'); },
+      pick:   function (x) { return J(x, 'が ありません'); },
+      yes:    function (x) { return J('はい、', x, 'が ありません。'); },
+      no:     function (x) { return J('いいえ、', x, 'が あります。'); },
+      en:     function (s, x) { return x + ' is missing.'; }
     },
     isAt: {
       cat: 'places', qWord: 'どこ',
@@ -1794,12 +1876,22 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
   var R = ns.ruby, JP = ns.jp, D = ns.data;
   var J = JP.J, tk = JP.tk;
 
-  var BEATS = ['hero', 'name', 'home', 'want', 'scene1', 'scene2', 'scene3', 'ending', 'recap'];
+  /* Each skeleton is a different shape for the same machinery below (say/
+   * ask/drill/round/spiral/speakTarget). "classic" is the original one;
+   * see buildCompareBeat/buildJourneyBeat/buildMysteryBeat for the others. */
+  var BEATS_BY_SKELETON = {
+    classic: ['hero', 'name', 'home', 'want', 'scene1', 'scene2', 'scene3', 'ending', 'recap'],
+    compare: ['hero', 'name', 'optionA', 'optionB', 'decide', 'outcome', 'recap'],
+    journey: ['hero', 'name', 'stop1', 'stop2', 'stop3', 'wrapup', 'recap'],
+    mystery: ['hero', 'name', 'mystery', 'suspect1', 'suspect2', 'suspect3', 'accuse', 'reveal', 'recap']
+  };
 
   function Story(config, options) {
     this.cfg = config;
     this.opt = options || {};
     this.level = this.opt.circling || 'normal';
+    this.skeletonId = BEATS_BY_SKELETON[this.opt.skeleton] ? this.opt.skeleton : 'classic';
+    this.beatNames = BEATS_BY_SKELETON[this.skeletonId];
     this.st = { script: [], reps: 0, asked: 0, correct: 0 };
     this.steps = [];
     this.i = -1;
@@ -1833,7 +1925,8 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
 
   Story.prototype.props = function () {
     var p = [];
-    if (this.st.want) p.push(D.guessIcon(this.st.want, 'things'));
+    var focus = this.st.want || this.st.winner || this.st.missingThing;
+    if (focus) p.push(D.guessIcon(focus, 'things'));
     return p;
   };
 
@@ -1845,6 +1938,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       tk: tokens,
       en: en || '',
       who: opt.who || 'narrator',
+      label: opt.label || '',
       mood: opt.mood || this.st.mood || 'happy',
       scene: opt.scene || this.scene(),
       props: opt.props || this.props(),
@@ -1933,6 +2027,13 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
 
   /* ---------- beats ---------- */
   Story.prototype.buildBeat = function (name) {
+    if (this.skeletonId === 'compare') return this.buildCompareBeat(name);
+    if (this.skeletonId === 'journey') return this.buildJourneyBeat(name);
+    if (this.skeletonId === 'mystery') return this.buildMysteryBeat(name);
+    return this.buildClassicBeat(name);
+  };
+
+  Story.prototype.buildClassicBeat = function (name) {
     var self = this;
 
     if (name === 'hero') {
@@ -2188,14 +2289,369 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     });
   };
 
+  /* ================= "Compare" skeleton =================
+   * A character weighs two options — each gets introduced, each gets a
+   * charming pro/con twist, then the class commits to a winner. Hero/name
+   * are identical to the classic skeleton, so those two beats just reuse it.
+   */
+  Story.prototype.buildCompareBeat = function (name) {
+    var self = this;
+    if (name === 'hero' || name === 'name') return this.buildClassicBeat(name);
+
+    if (name === 'optionA' || name === 'optionB') {
+      var isA = name === 'optionA';
+      this.ask({
+        q: isA
+          ? R.parse('何[なに]が いいと 思[おも]いますか。（１つ目）')
+          : R.parse('では、もう 一[ひと]つは 何[なに]が いいですか。（２つ目）'),
+        qEn: isA ? 'What might be good? (Option one.)' : 'What is the other option? (Option two.)',
+        options: this.options('things', 4, isA ? [] : [this.st.optionA]).map(function (it) {
+          return { item: it, icon: D.guessIcon(it, 'things'), tk: tk(it), en: it.e };
+        }),
+        onPick: function (opt) {
+          if (isA) self.st.optionA = opt.item; else self.st.optionB = opt.item;
+          self.st.mood = 'excited';
+          self.say(J(self.nameTk(), 'は ', tk(opt.item), 'が いいと 思[おも]いました。'),
+            self.nameEn() + ' thought ' + (opt.item.e || opt.item.w) + ' might be good.',
+            { who: 'narrator', mood: 'excited', icon: opt.icon, sfx: 'flip' });
+          self.speakTarget(0, opt.item, 'excited');
+          self.round('wants', self.nameTk(), self.nameEn(), opt.item, 'things', isA ? '１つ目' : '２つ目');
+
+          var card = JP.pick(D.COMPARE_TRAITS);
+          self.say(JP.fill(card.ja, { opt: tk(opt.item) }), card.en,
+            { who: 'narrator', icon: card.icon, sfx: 'flip' });
+
+          var feelings = self.options('feelings', 3, isA ? [] : [self.st.feelingA]);
+          self.ask({
+            q: J(tk(opt.item), 'は どうですか。'),
+            qEn: 'How does that option seem overall?',
+            options: feelings.map(function (it) {
+              return { item: it, icon: D.guessIcon(it, 'feelings'), tk: tk(it), en: it.e };
+            }),
+            onPick: function (fopt) {
+              if (isA) self.st.feelingA = fopt.item; else self.st.feelingB = fopt.item;
+              self.st.mood = D.moodFor(fopt.item);
+              self.say(J(tk(opt.item), 'は とても ', tk(fopt.item), 'です。'),
+                (opt.item.e || opt.item.w) + ' seems very ' + (fopt.item.e || fopt.item.w) + '.',
+                { who: 'hero', mood: self.st.mood, icon: fopt.icon });
+              self.round('feels', tk(opt.item), opt.item.e || opt.item.w, fopt.item, 'feelings', isA ? 'とくちょう１' : 'とくちょう２');
+              self.speakTarget(1, fopt.item, self.st.mood);
+            }
+          });
+        }
+      });
+      return;
+    }
+
+    if (name === 'decide') {
+      this.say(R.parse('けっしんの とき'), 'Decision time', { who: 'chapter', mood: 'neutral' });
+      this.ask({
+        q: R.parse('けっきょく、どちらに しますか。'),
+        qEn: 'In the end, which one do you choose?',
+        options: [this.st.optionA, this.st.optionB].map(function (it) {
+          return { item: it, icon: D.guessIcon(it, 'things'), tk: tk(it), en: it.e };
+        }),
+        onPick: function (opt) {
+          self.st.winner = opt.item;
+          self.st.other = (opt.item.w === self.st.optionA.w) ? self.st.optionB : self.st.optionA;
+          self.st.mood = 'excited';
+          self.say(J(self.nameTk(), 'は 「', tk(opt.item), 'に します！」と 言[い]いました。'),
+            self.nameEn() + ' said, "I choose ' + (opt.item.e || opt.item.w) + '!"',
+            { who: 'hero', mood: 'excited', icon: opt.icon, sfx: 'flip' });
+          self.speakTarget(2, opt.item, 'excited');
+          self.round('wants', self.nameTk(), self.nameEn(), opt.item, 'things', 'けってい');
+        }
+      });
+      return;
+    }
+
+    if (name === 'outcome') {
+      var cards = JP.shuffle(D.COMPARE_OUTCOMES).slice(0, 3);
+      var slots = { name: this.nameTk(), winner: tk(this.st.winner), other: tk(this.st.other) };
+      this.ask({
+        q: R.parse('さいごに、どう なりますか。'),
+        qEn: 'How does it turn out?',
+        options: cards.map(function (c) {
+          return { ending: c, icon: c.icon, tk: JP.fill(c.ja, slots), en: c.en };
+        }),
+        onPick: function (o) {
+          var c = o.ending;
+          self.st.mood = c.kind === 'happy' ? 'excited' : 'surprised';
+          self.say(JP.fill(c.ja, slots), c.en,
+            { who: 'narrator', mood: self.st.mood, icon: c.icon, sfx: c.kind === 'happy' ? 'win' : 'oops' });
+
+          self.drill([{
+            type: 'yn',
+            prompt: J(self.nameTk(), 'は ', tk(self.st.winner), 'を えらびましたか。'),
+            en: 'Did they end up with their choice?',
+            choices: [
+              { tk: R.parse('はい、そうです'), icon: '⭕', correct: c.kind === 'happy' },
+              { tk: R.parse('いいえ、ちがいます'), icon: '❌', correct: c.kind !== 'happy' }
+            ],
+            echo: c.kind === 'happy'
+              ? J('はい！', self.nameTk(), 'は ', tk(self.st.winner), 'が あります。')
+              : J('いいえ。でも、', self.nameTk(), 'は げんきです。'),
+            focus: self.st.winner
+          }], 'けっか');
+
+          self.say(R.parse('おしまい。'), 'The end.', { who: 'chapter', mood: self.st.mood, sfx: 'win' });
+        }
+      });
+      return;
+    }
+
+    if (name === 'recap') {
+      this.steps.push({ kind: 'recap', scene: this.scene(), mood: 'excited', props: this.props() });
+      return;
+    }
+  };
+
+  /* ================= "Journey" skeleton =================
+   * Three stops in a row. Nothing carries forward as a failure - each stop
+   * gets its own small (mostly upbeat) event, resolved immediately, which
+   * keeps the tone lighter and episodic rather than cumulative.
+   */
+  Story.prototype.buildJourneyBeat = function (name) {
+    var self = this;
+    if (name === 'hero' || name === 'name') return this.buildClassicBeat(name);
+
+    if (name === 'stop1' || name === 'stop2' || name === 'stop3') {
+      var n = name === 'stop1' ? 1 : name === 'stop2' ? 2 : 3;
+      var visited = (this.st.stops || []).map(function (s) { return s.place; });
+      var qs = [
+        R.parse('はじめに、どこに 行[い]きますか。'),
+        R.parse('それから、どこに 行[い]きますか。'),
+        R.parse('さいごに、どこに 行[い]きますか。')
+      ];
+      var qsEn = ['First, where do you go?', 'Then, where do you go?', 'Finally, where do you go?'];
+      var chapterKanji = n === 1 ? '一[いち]' : n === 2 ? '二[に]' : '三[さん]';
+      this.say(R.parse('よてい ' + chapterKanji), 'Stop ' + n, { who: 'chapter', mood: 'neutral' });
+      this.ask({
+        q: qs[n - 1],
+        qEn: qsEn[n - 1],
+        options: this.options('places', 4, visited).map(function (it) {
+          return { item: it, icon: D.guessIcon(it, 'places'), tk: tk(it), en: it.e };
+        }),
+        onPick: function (opt) {
+          self.st.stops = self.st.stops || [];
+          self.st.stops.push({ place: opt.item });
+          self.st.scene = D.sceneKindFor(opt.item);
+          self.st.mood = 'happy';
+          self.say(J(self.nameTk(), 'は ', tk(opt.item), 'に 行[い]きます。'),
+            self.nameEn() + ' goes to the ' + (opt.item.e || opt.item.w) + '.',
+            { who: 'narrator', scene: self.st.scene, icon: opt.icon, sfx: 'flip' });
+          self.speakTarget(n === 1 ? 0 : 1, opt.item, 'happy');
+          self.round('goes', self.nameTk(), self.nameEn(), opt.item, 'places', 'ばしょ ' + n);
+
+          var card = JP.pick(D.JOURNEY_EVENTS);
+          self.st.stops[self.st.stops.length - 1].event = card;
+          self.say(JP.fill(card.ja, { place: tk(opt.item) }), card.en,
+            { who: 'narrator', mood: 'happy', icon: card.icon, sfx: 'flip' });
+
+          var feelings = self.options('feelings', 3);
+          self.ask({
+            q: J(self.nameTk(), 'は どう 思[おも]いましたか。'),
+            qEn: 'How did that feel?',
+            options: feelings.map(function (it) {
+              return { item: it, icon: D.guessIcon(it, 'feelings'), tk: tk(it), en: it.e };
+            }),
+            onPick: function (fopt) {
+              self.st.mood = D.moodFor(fopt.item);
+              self.say(J(self.nameTk(), 'は とても ', tk(fopt.item), 'です。'),
+                self.nameEn() + ' felt very ' + (fopt.item.e || fopt.item.w) + '.',
+                { who: 'hero', mood: self.st.mood, icon: fopt.icon });
+              self.round('feels', self.nameTk(), self.nameEn(), fopt.item, 'feelings', 'きもち ' + n);
+            }
+          });
+        }
+      });
+      return;
+    }
+
+    if (name === 'wrapup') {
+      var stops = this.st.stops || [];
+      var p3 = stops[2] && stops[2].place;
+      this.say(J(this.nameTk(), 'は 今日[きょう] ', tk(stops[0] && stops[0].place),
+        'と ', tk(stops[1] && stops[1].place), 'と ', tk(p3), 'に 行[い]きました。'),
+        this.nameEn() + ' went to three places today.', { who: 'narrator', mood: 'happy', sfx: 'flip' });
+      this.speakTarget(2, p3, 'happy');
+      this.drill([{
+        type: 'yn',
+        prompt: J(this.nameTk(), 'は たのしい 一日[いちにち]でしたか。'),
+        en: 'Was it a fun day?',
+        choices: [
+          { tk: R.parse('はい、そうです'), icon: '⭕', correct: true },
+          { tk: R.parse('いいえ、ちがいます'), icon: '❌', correct: false }
+        ],
+        echo: R.parse('はい、とても たのしい 一日[いちにち]でした。'),
+        focus: p3
+      }], 'まとめ');
+      this.say(R.parse('おしまい。'), 'The end.', { who: 'chapter', mood: 'happy', sfx: 'win' });
+      return;
+    }
+
+    if (name === 'recap') {
+      this.steps.push({ kind: 'recap', scene: this.scene(), mood: 'happy', props: this.props() });
+      return;
+    }
+  };
+
+  /* ================= "Mystery" skeleton =================
+   * Something goes missing; the class interviews three suspects (one is
+   * secretly guilty, chosen at random) and finally accuses one. Guessing
+   * "suspicious or not" for each suspect is scored against who is actually
+   * guilty, so there is a small real deduction game under the language work.
+   */
+  Story.prototype.buildMysteryBeat = function (name) {
+    var self = this;
+    if (name === 'name') return this.buildClassicBeat(name);
+
+    if (name === 'hero') {
+      this.st.scene = 'town';
+      this.say(R.parse('ある 日[ひ]、たいへんな ことが おこりました。'),
+        'One day, something terrible happened.', { who: 'narrator', mood: 'surprised' });
+      this.ask({
+        q: R.parse('たんていは だれですか。'),
+        qEn: 'Who is the detective?',
+        hint: 'Class vote!',
+        options: this.options('people', 4).map(function (it) {
+          return { item: it, icon: D.guessIcon(it, 'people'), tk: tk(it), en: it.e, avatar: it };
+        }),
+        onPick: function (opt) {
+          self.st.hero = opt.item;
+          self.st.mood = 'neutral';
+          self.say(J('たんていは ', tk(opt.item), 'です。'),
+            'The detective is a ' + (opt.item.e || opt.item.w) + '.',
+            { who: 'narrator', icon: opt.icon, sfx: 'flip' });
+          self.round('isA', R.parse('たんてい'), 'The detective', opt.item, 'people', 'たんてい');
+        }
+      });
+      return;
+    }
+
+    if (name === 'mystery') {
+      this.ask({
+        q: R.parse('なにが なくなりましたか。'),
+        qEn: 'What went missing?',
+        options: this.options('things', 4).map(function (it) {
+          return { item: it, icon: D.guessIcon(it, 'things'), tk: tk(it), en: it.e };
+        }),
+        onPick: function (opt) {
+          self.st.missingThing = opt.item;
+          self.st.mood = 'surprised';
+          self.say(J('「わたしの ', tk(opt.item), 'が ありません！」'),
+            'My ' + (opt.item.e || opt.item.w) + ' is missing!',
+            { who: 'narrator', mood: 'surprised', icon: opt.icon, sfx: 'oops' });
+          self.speakTarget(0, opt.item, 'surprised');
+          self.round('missing', R.parse('それ'), 'It', opt.item, 'things', 'なくしもの');
+          self.st.guiltyIndex = Math.floor(Math.random() * 3);
+          self.st.suspects = [];
+        }
+      });
+      return;
+    }
+
+    if (name === 'suspect1' || name === 'suspect2' || name === 'suspect3') {
+      var n = name === 'suspect1' ? 1 : name === 'suspect2' ? 2 : 3;
+      var exclude = [this.st.hero].concat((this.st.suspects || []).map(function (s) { return s.item; }));
+      var chapterKanji = n === 1 ? '一[いち]' : n === 2 ? '二[に]' : '三[さん]';
+      this.say(R.parse('ようぎしゃ ' + chapterKanji), 'Suspect ' + n, { who: 'chapter', mood: 'neutral' });
+      this.ask({
+        q: R.parse('つぎの ようぎしゃは だれですか。'),
+        qEn: 'Who is the next suspect?',
+        options: this.options('people', 4, exclude).map(function (it) {
+          return { item: it, icon: D.guessIcon(it, 'people'), tk: tk(it), en: it.e, avatar: it };
+        }),
+        onPick: function (opt) {
+          self.st.suspects.push({ item: opt.item });
+          self.st.helper = opt.item;
+          self.st.mood = 'neutral';
+          var label = R.text(tk(opt.item));
+          self.say(J(tk(opt.item), 'が とうじょうします。'),
+            (opt.item.e || opt.item.w) + ' appears.',
+            { who: 'helper', label: label, icon: opt.icon, sfx: 'flip' });
+          self.speakTarget(1, opt.item, 'neutral');
+          self.round('isA', R.parse('ようぎしゃ'), 'The suspect', opt.item, 'people', 'ようぎしゃ ' + n);
+
+          var card = JP.pick(D.MYSTERY_CLUES);
+          self.st.suspects[self.st.suspects.length - 1].clue = card;
+          self.say(R.parse(card.ja), card.en, { who: 'helper', label: label, icon: card.icon });
+
+          var guilty = (n - 1) === self.st.guiltyIndex;
+          self.drill([{
+            type: 'yn',
+            prompt: J(tk(opt.item), 'は あやしいと 思[おも]いますか。'),
+            en: 'Do you think this suspect is up to something?',
+            choices: [
+              { tk: R.parse('はい、あやしいです'), icon: '🤔', correct: guilty },
+              { tk: R.parse('いいえ、あやしくないです'), icon: '🙂', correct: !guilty }
+            ],
+            echo: R.parse('メモしましょう。'),
+            focus: opt.item
+          }], 'ちょうしゅ ' + n);
+        }
+      });
+      return;
+    }
+
+    if (name === 'accuse') {
+      this.say(R.parse('はんてい'), 'The verdict', { who: 'chapter', mood: 'neutral' });
+      this.ask({
+        q: R.parse('たんていは だれが はんにんだと 思[おも]いますか。'),
+        qEn: 'Who does the detective accuse?',
+        options: this.st.suspects.map(function (s) {
+          return { item: s.item, icon: D.guessIcon(s.item, 'people'), tk: tk(s.item), en: s.item.e, avatar: s.item };
+        }),
+        onPick: function (opt) {
+          self.st.accused = opt.item;
+          self.st.mood = 'excited';
+          self.say(J('たんていは 「', tk(opt.item), 'が はんにんです！」と 言[い]いました。'),
+            'The detective said, "' + (opt.item.e || opt.item.w) + ' is the culprit!"',
+            { who: 'hero', mood: 'excited', icon: opt.icon, sfx: 'flip' });
+          self.speakTarget(2, opt.item, 'excited');
+        }
+      });
+      return;
+    }
+
+    if (name === 'reveal') {
+      var actual = this.st.suspects[this.st.guiltyIndex].item;
+      var correct = actual.w === this.st.accused.w;
+      this.st.mood = correct ? 'excited' : 'surprised';
+      this.say(correct
+        ? J('せいかい！', tk(this.st.accused), 'が はんにんでした！')
+        : J('ざんねん！じつは ', tk(actual), 'が はんにんでした！'),
+        correct ? 'Correct! That was the culprit!' : 'Actually, it was someone else!',
+        { who: 'narrator', mood: this.st.mood, sfx: correct ? 'win' : 'oops' });
+      this.drill([{
+        type: 'yn',
+        prompt: R.parse('じけんは かいけつしましたか。'),
+        en: 'Was the case solved?',
+        choices: [
+          { tk: R.parse('はい、そうです'), icon: '⭕', correct: correct },
+          { tk: R.parse('いいえ、ちがいます'), icon: '❌', correct: !correct }
+        ],
+        echo: correct ? R.parse('じけん かいけつ！') : R.parse('また こんど がんばりましょう。'),
+        focus: this.st.missingThing
+      }], 'かいけつ');
+      this.say(R.parse('おしまい。'), 'The end.', { who: 'chapter', mood: this.st.mood, sfx: 'win' });
+      return;
+    }
+
+    if (name === 'recap') {
+      this.steps.push({ kind: 'recap', scene: this.scene(), mood: 'excited', props: this.props() });
+      return;
+    }
+  };
+
   /* ---------- navigation ---------- */
   Story.prototype.currentStep = function () { return this.steps[this.i] || null; };
 
   Story.prototype.advance = function () {
     if (this.i < this.steps.length - 1) { this.i++; return this.currentStep(); }
-    while (this.beat < BEATS.length) {
+    while (this.beat < this.beatNames.length) {
       var before = this.steps.length;
-      this.buildBeat(BEATS[this.beat++]);
+      this.buildBeat(this.beatNames[this.beat++]);
       if (this.steps.length > before) { this.i++; return this.currentStep(); }
     }
     return null;
@@ -2215,11 +2671,11 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
   };
 
   Story.prototype.progress = function () {
-    return { beat: Math.min(this.beat, BEATS.length), total: BEATS.length };
+    return { beat: Math.min(this.beat, this.beatNames.length), total: this.beatNames.length };
   };
 
   ns.Story = Story;
-  ns.BEATS = BEATS;
+  ns.BEATS_BY_SKELETON = BEATS_BY_SKELETON;
 })(window.CCS = window.CCS || {});
 
 </script>
@@ -2349,7 +2805,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
 
   var config = null;
   var story = null;
-  var ui = { script: 'furi', english: true, level: 'minimal', big: false, autoSpeak: true, preset: null };
+  var ui = { script: 'furi', english: true, level: 'minimal', big: false, autoSpeak: true, preset: null, skeleton: 'classic' };
   var lastScene = null;
 
   function $(sel, root) { return (root || document).querySelector(sel); }
@@ -2434,6 +2890,23 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
         renderSetup();
       };
       box.appendChild(b);
+    });
+
+    /* story shapes */
+    var skelBox = $('#skeletons');
+    skelBox.innerHTML = '';
+    D.SKELETONS.forEach(function (sk) {
+      var sb = el('button', 'preset' + (ui.skeleton === sk.id ? ' selected' : ''),
+        '<div class="pi">' + sk.icon + '</div>' +
+        '<div class="pn">' + R.escapeHtml(sk.name) + '</div>' +
+        '<div class="pe">' + R.escapeHtml(sk.en) + '</div>');
+      sb.type = 'button';
+      sb.onclick = function () {
+        ui.skeleton = sk.id;
+        applyUi();
+        renderSetup();
+      };
+      skelBox.appendChild(sb);
     });
 
     $('#title').value = config.title || '';
@@ -2666,7 +3139,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     if (problems) { window.alert(problems); return; }
     config.title = $('#title').value || config.title;
     saveConfig();
-    story = new ns.Story(config, { circling: ui.level });
+    story = new ns.Story(config, { circling: ui.level, skeleton: ui.skeleton });
     lastScene = null;
     show('play');
     step(story.advance());
@@ -2674,9 +3147,12 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
 
   function validate() {
     var need = [];
+    var minPeople = ui.skeleton === 'mystery' ? 4 : 3; /* hero + 3 distinct suspects */
     ['people', 'places', 'things', 'feelings'].forEach(function (k) {
       var n = (config.vocab[k] || []).filter(function (x) { return x.w && x.w.trim(); }).length;
-      if (n < 3) need.push('・' + k + ' needs at least 3 words (you have ' + n + ')');
+      var min = k === 'people' ? minPeople : 3;
+      if (n < min) need.push('・' + k + ' needs at least ' + min + ' words (you have ' + n + ')' +
+        (k === 'people' && min > 3 ? ' — the mystery skeleton needs one extra for a third suspect' : ''));
     });
     if (!need.length) {
       /* drop half-finished rows so the story never shows an empty card */
@@ -2713,7 +3189,8 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     }
     host.appendChild(layer);
 
-    var icon = step.icon || (story.st.want ? D.guessIcon(story.st.want, 'things') : '');
+    var focus = story.st.want || story.st.winner || story.st.missingThing;
+    var icon = step.icon || (focus ? D.guessIcon(focus, 'things') : '');
     if (icon) {
       host.insertAdjacentHTML('beforeend', art.propBubble(icon, ''));
     }
@@ -2745,9 +3222,9 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
 
   function renderSay(s, body) {
     if (s.sfx) audio.play(s.sfx);
-    var who = s.who === 'hero' ? (story.st.name ? R.text(story.nameTk()) : 'しゅじんこう')
+    var who = s.label || (s.who === 'hero' ? (story.st.name ? R.text(story.nameTk()) : 'しゅじんこう')
             : s.who === 'helper' ? 'ヘルパー'
-            : s.who === 'chapter' ? '' : 'ナレーター';
+            : s.who === 'chapter' ? '' : 'ナレーター');
     var d = el('div', 'dialogue ' + s.who);
     var head = el('div', 'who', (who ? '<span>' + R.escapeHtml(who) + '</span>' : '') +
       (s.target ? '<span class="q-tag">ターゲット</span>' : ''));
@@ -2951,12 +3428,20 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     return b;
   }
 
-  /* Hide the story's key words so the class retells it from the pictures. */
+  /* Hide the story's key words so the class retells it from the pictures.
+   * Walks story.st generically (rather than naming classic's fields) so
+   * every skeleton's picks - places, suspects, options, whatever - get
+   * hidden the same way. */
+  var GAP_SKIP = { script: 1, reps: 1, asked: 1, correct: 1, mood: 1, scene: 1, guiltyIndex: 1 };
   function gapped(tokens) {
     var keys = {};
-    [story.st.hero, story.st.name, story.st.want, story.st.home, story.st.helper, story.st.feeling]
-      .concat((story.st.tries || []).map(function (t) { return t.place; }))
-      .forEach(function (x) { if (x && x.w) keys[x.w] = true; });
+    function mark(v) {
+      if (!v || typeof v !== 'object') return;
+      if (typeof v.w === 'string' && typeof v.r === 'string') { keys[v.w] = true; return; }
+      if (Array.isArray(v)) { v.forEach(mark); return; }
+      Object.keys(v).forEach(function (k) { mark(v[k]); });
+    }
+    Object.keys(story.st).forEach(function (k) { if (!GAP_SKIP[k]) mark(story.st[k]); });
 
     return tokens.map(function (tkn) {
       if (tkn.sp) return '<span class="sp"></span>';

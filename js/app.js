@@ -10,7 +10,7 @@
 
   var config = null;
   var story = null;
-  var ui = { script: 'furi', english: true, level: 'minimal', big: false, autoSpeak: true, preset: null };
+  var ui = { script: 'furi', english: true, level: 'minimal', big: false, autoSpeak: true, preset: null, skeleton: 'classic' };
   var lastScene = null;
 
   function $(sel, root) { return (root || document).querySelector(sel); }
@@ -95,6 +95,23 @@
         renderSetup();
       };
       box.appendChild(b);
+    });
+
+    /* story shapes */
+    var skelBox = $('#skeletons');
+    skelBox.innerHTML = '';
+    D.SKELETONS.forEach(function (sk) {
+      var sb = el('button', 'preset' + (ui.skeleton === sk.id ? ' selected' : ''),
+        '<div class="pi">' + sk.icon + '</div>' +
+        '<div class="pn">' + R.escapeHtml(sk.name) + '</div>' +
+        '<div class="pe">' + R.escapeHtml(sk.en) + '</div>');
+      sb.type = 'button';
+      sb.onclick = function () {
+        ui.skeleton = sk.id;
+        applyUi();
+        renderSetup();
+      };
+      skelBox.appendChild(sb);
     });
 
     $('#title').value = config.title || '';
@@ -327,7 +344,7 @@
     if (problems) { window.alert(problems); return; }
     config.title = $('#title').value || config.title;
     saveConfig();
-    story = new ns.Story(config, { circling: ui.level });
+    story = new ns.Story(config, { circling: ui.level, skeleton: ui.skeleton });
     lastScene = null;
     show('play');
     step(story.advance());
@@ -335,9 +352,12 @@
 
   function validate() {
     var need = [];
+    var minPeople = ui.skeleton === 'mystery' ? 4 : 3; /* hero + 3 distinct suspects */
     ['people', 'places', 'things', 'feelings'].forEach(function (k) {
       var n = (config.vocab[k] || []).filter(function (x) { return x.w && x.w.trim(); }).length;
-      if (n < 3) need.push('・' + k + ' needs at least 3 words (you have ' + n + ')');
+      var min = k === 'people' ? minPeople : 3;
+      if (n < min) need.push('・' + k + ' needs at least ' + min + ' words (you have ' + n + ')' +
+        (k === 'people' && min > 3 ? ' — the mystery skeleton needs one extra for a third suspect' : ''));
     });
     if (!need.length) {
       /* drop half-finished rows so the story never shows an empty card */
@@ -374,7 +394,8 @@
     }
     host.appendChild(layer);
 
-    var icon = step.icon || (story.st.want ? D.guessIcon(story.st.want, 'things') : '');
+    var focus = story.st.want || story.st.winner || story.st.missingThing;
+    var icon = step.icon || (focus ? D.guessIcon(focus, 'things') : '');
     if (icon) {
       host.insertAdjacentHTML('beforeend', art.propBubble(icon, ''));
     }
@@ -406,9 +427,9 @@
 
   function renderSay(s, body) {
     if (s.sfx) audio.play(s.sfx);
-    var who = s.who === 'hero' ? (story.st.name ? R.text(story.nameTk()) : 'しゅじんこう')
+    var who = s.label || (s.who === 'hero' ? (story.st.name ? R.text(story.nameTk()) : 'しゅじんこう')
             : s.who === 'helper' ? 'ヘルパー'
-            : s.who === 'chapter' ? '' : 'ナレーター';
+            : s.who === 'chapter' ? '' : 'ナレーター');
     var d = el('div', 'dialogue ' + s.who);
     var head = el('div', 'who', (who ? '<span>' + R.escapeHtml(who) + '</span>' : '') +
       (s.target ? '<span class="q-tag">ターゲット</span>' : ''));
@@ -612,12 +633,20 @@
     return b;
   }
 
-  /* Hide the story's key words so the class retells it from the pictures. */
+  /* Hide the story's key words so the class retells it from the pictures.
+   * Walks story.st generically (rather than naming classic's fields) so
+   * every skeleton's picks - places, suspects, options, whatever - get
+   * hidden the same way. */
+  var GAP_SKIP = { script: 1, reps: 1, asked: 1, correct: 1, mood: 1, scene: 1, guiltyIndex: 1 };
   function gapped(tokens) {
     var keys = {};
-    [story.st.hero, story.st.name, story.st.want, story.st.home, story.st.helper, story.st.feeling]
-      .concat((story.st.tries || []).map(function (t) { return t.place; }))
-      .forEach(function (x) { if (x && x.w) keys[x.w] = true; });
+    function mark(v) {
+      if (!v || typeof v !== 'object') return;
+      if (typeof v.w === 'string' && typeof v.r === 'string') { keys[v.w] = true; return; }
+      if (Array.isArray(v)) { v.forEach(mark); return; }
+      Object.keys(v).forEach(function (k) { mark(v[k]); });
+    }
+    Object.keys(story.st).forEach(function (k) { if (!GAP_SKIP[k]) mark(story.st[k]); });
 
     return tokens.map(function (tkn) {
       if (tkn.sp) return '<span class="sp"></span>';
