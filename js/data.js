@@ -300,13 +300,19 @@
 
   /* ---------- "Compare" skeleton cards ---------- */
   /* build(ctx) gets {opt} for the option just introduced. */
+  /* {opt} is always a 'things' item, which spans food, school subjects,
+   * hobbies/activities, physical objects and abstract concepts (work,
+   * an experience) depending on the pack - so every card here needs to
+   * read sensibly for all of those, not just physical objects. "far
+   * away" and "boring" didn't (a souvenir isn't "far away", and calling
+   * a towel "boring" is the same kind of mismatch as calling it happy). */
   var COMPARE_TRAITS = [
     { id: 'expensive', icon: '💸', en: '…but it’s expensive!', ja: 'でも、{opt}は ちょっと たかいです。' },
-    { id: 'far', icon: '🚶', en: '…but it’s far away!', ja: 'でも、{opt}は とおくに あります。' },
+    { id: 'lovely', icon: '✨', en: '…and it’s lovely!', ja: 'そして、{opt}は とても すてきです！' },
     { id: 'popular', icon: '⭐', en: '…and it’s very popular!', ja: 'そして、{opt}は とても にんきです！' },
     { id: 'rare', icon: '🦄', en: '…but it’s hard to find!', ja: 'でも、{opt}は みつけにくいです。' },
     { id: 'perfect', icon: '💯', en: '…it’s perfect!', ja: 'そして、{opt}は かんぺきです！' },
-    { id: 'boring', icon: '😐', en: '…a little boring, though.', ja: 'でも、{opt}は ちょっと つまらないです。' }
+    { id: 'meh', icon: '😐', en: '…kind of so-so, though.', ja: 'でも、{opt}は ちょっと びみょうです。' }
   ];
 
   /* Compare's own fixed target grammar - these name the two options

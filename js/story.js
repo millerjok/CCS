@@ -838,6 +838,14 @@
   /* ---------- navigation ---------- */
   Story.prototype.currentStep = function () { return this.steps[this.i] || null; };
 
+  /* Steps already built stay in this.steps forever (advance() below only
+   * ever builds more, never discards), so moving back is just moving the
+   * cursor - no rebuilding, and nothing about the step itself changes. */
+  Story.prototype.back = function () {
+    if (this.i > 0) this.i--;
+    return this.currentStep();
+  };
+
   Story.prototype.advance = function () {
     if (this.i < this.steps.length - 1) { this.i++; return this.currentStep(); }
     while (this.beat < this.beatNames.length) {

@@ -406,14 +406,21 @@
   function step(s) {
     var body = $('#play-body');
     body.innerHTML = '';
+    var backBtn = $('#back-step');
+    if (backBtn) backBtn.disabled = !story || story.i <= 0;
     if (!s) { renderRecap(); return; }
 
     renderStage(s);
     renderMeters();
 
+    /* Re-visiting an already-answered choice or already-circled drill (via
+     * the back button) must not let the class re-pick or re-score it -
+     * story.answer() already no-ops on a re-pick, but re-rendering the
+     * interactive version invites clicking it anyway. Show a read-only
+     * recap of it instead, with its own way back to the frontier. */
     if (s.kind === 'say') return renderSay(s, body);
-    if (s.kind === 'choose') return renderChoose(s, body);
-    if (s.kind === 'circle') return renderCircle(s, body);
+    if (s.kind === 'choose') return s.answered ? renderChooseReview(s, body) : renderChoose(s, body);
+    if (s.kind === 'circle') return s.done ? renderCircleReview(s, body) : renderCircle(s, body);
     if (s.kind === 'recap') return renderRecap();
   }
 
@@ -490,13 +497,59 @@
     if (ui.autoSpeak) setTimeout(function () { speakTokens(s.q); }, 260);
   }
 
+  /* Read-only view of a choice already made, shown when the back button
+   * revisits it - the picked option stays marked, everything is disabled,
+   * and "next" just moves the cursor forward again (story.advance()),
+   * never story.answer(), which would re-run onPick's side effects. */
+  function renderChooseReview(s, body) {
+    var q = el('div', 'question');
+    q.innerHTML = '<span class="q-tag">きめて！ your choice</span>';
+    var qh = el('div', 'q-jp jp', line(s.q));
+    q.appendChild(qh);
+    qh.appendChild(speakBtn(s.q));
+    if (s.qEn) q.appendChild(el('div', 'q-en', R.escapeHtml(s.qEn)));
+
+    var opts = el('div', 'options');
+    var matched = false;
+    s.options.forEach(function (o, idx) {
+      var picked = o === s.answered;
+      if (picked) matched = true;
+      var b = el('button', 'opt' + (picked ? ' correct' : ''));
+      b.type = 'button';
+      b.disabled = true;
+      b.innerHTML =
+        (o.avatar ? '<span class="opt-avatar">' + art.actor(o.avatar, 'happy', '') + '</span>'
+                  : '<span class="opt-icon">' + R.escapeHtml(o.icon || '⭐') + '</span>') +
+        '<span class="opt-jp jp">' + line(o.tk) + '</span>' +
+        (o.en ? '<span class="opt-en">' + R.escapeHtml(o.en) + '</span>' : '');
+      b.dataset.key = String(idx + 1);
+      opts.appendChild(b);
+    });
+    q.appendChild(opts);
+
+    if (!matched && s.answered) {
+      var echo = el('div', 'echo');
+      echo.innerHTML = '<span class="echo-tag">じぶんで かいた (your own answer)</span>' +
+        '<span class="jp">' + line(s.answered.tk) + '</span>';
+      q.appendChild(echo);
+    }
+
+    body.appendChild(q);
+    var next = el('button', 'btn big', 'つぎへ ▶');
+    next.onclick = function () { step(story.advance()); };
+    var row = el('div', 'row'); row.style.marginTop = '1rem';
+    row.appendChild(next);
+    body.appendChild(row);
+    focusNext(next);
+  }
+
   function renderCircle(s, body) {
     var idx = 0;
 
     function drawQuestion() {
       body.innerHTML = '';
       var qn = s.questions[idx];
-      if (!qn) { step(story.advance()); return; }
+      if (!qn) { s.done = true; step(story.advance()); return; }
 
       var q = el('div', 'question');
       q.innerHTML = '<span class="q-tag ' + (qn.spiral ? 'spiral' : 'drill') + '">' +
@@ -554,6 +607,28 @@
     }
 
     drawQuestion();
+  }
+
+  /* Read-only view of a drill already fully answered, shown when the back
+   * button revisits it - just the sentences it circled, no clickable
+   * questions (re-answering would score it a second time). */
+  function renderCircleReview(s, body) {
+    var q = el('div', 'question');
+    q.innerHTML = '<span class="q-tag drill">' + R.escapeHtml(s.label || 'しつもん') + ' — already circled</span>';
+    var list = el('div', 'story-lines');
+    s.questions.forEach(function (qn) {
+      var row = el('div', 'story-line');
+      row.appendChild(el('div', 'txt jp', line(qn.echo)));
+      list.appendChild(row);
+    });
+    q.appendChild(list);
+    body.appendChild(q);
+    var next = el('button', 'btn big', 'つぎへ ▶');
+    next.onclick = function () { step(story.advance()); };
+    var row2 = el('div', 'row'); row2.style.marginTop = '1rem';
+    row2.appendChild(next);
+    body.appendChild(row2);
+    focusNext(next);
   }
 
   function focusNext(btn) {
@@ -699,6 +774,7 @@
     $('#start').onclick = startStory;
     $('#back-setup').onclick = function () { audio.stop(); show('setup'); };
     $('#brand-home').onclick = function () { audio.stop(); show('setup'); };
+    $('#back-step').onclick = function () { if (story) step(story.back()); };
     $('#circling').onchange = function () { ui.level = this.value; applyUi(); };
     $('#share').onclick = function () {
       var url = shareLink();
@@ -709,8 +785,12 @@
       } catch (e) { window.prompt('Copy this link:', url); }
     };
     $('#reset').onclick = function () {
-      if (!window.confirm('Reset the word lists back to the starter pack?')) return;
-      config = cloneConfig(D.DEFAULT_CONFIG);
+      if (!window.confirm('Reset the word lists back to this pack\'s built-in defaults?')) return;
+      /* Reset to whichever pack is actually selected, not always the
+       * starter pack - this also doubles as "give me the latest built-in
+       * version" for a pack a browser saved a copy of a while ago. */
+      var current = D.PRESETS.filter(function (p) { return p.id === ui.preset; })[0];
+      config = cloneConfig(current ? current.config : D.DEFAULT_CONFIG);
       saveConfig(); renderSetup();
     };
 
@@ -719,6 +799,11 @@
       if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') {
         var next = $('#play-body .btn.big') || $('#play-body .btn');
         if (next) { e.preventDefault(); next.click(); }
+        return;
+      }
+      if (e.key === 'ArrowLeft') {
+        var back = $('#back-step');
+        if (back && !back.disabled) { e.preventDefault(); back.click(); }
         return;
       }
       if (/^[1-4]$/.test(e.key)) {

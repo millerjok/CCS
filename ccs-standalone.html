@@ -409,6 +409,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
   <section class="screen" id="play">
     <div class="row" style="margin-bottom:.6rem">
       <button class="btn ghost no-print" id="back-setup" type="button">← Setup</button>
+      <button class="btn ghost no-print" id="back-step" type="button">◀ まえへ</button>
       <div class="spacer"></div>
       <div class="meters" id="meters"></div>
     </div>
@@ -417,7 +418,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     </div>
     <div id="play-body"></div>
     <p class="meter no-print" style="margin-top:1rem">
-      Keyboard: <b>Space</b> = next&emsp;<b>1–4</b> = answer
+      Keyboard: <b>Space</b> = next&emsp;<b>←</b> = back&emsp;<b>1–4</b> = answer
     </p>
   </section>
 
@@ -888,13 +889,19 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
 
   /* ---------- "Compare" skeleton cards ---------- */
   /* build(ctx) gets {opt} for the option just introduced. */
+  /* {opt} is always a 'things' item, which spans food, school subjects,
+   * hobbies/activities, physical objects and abstract concepts (work,
+   * an experience) depending on the pack - so every card here needs to
+   * read sensibly for all of those, not just physical objects. "far
+   * away" and "boring" didn't (a souvenir isn't "far away", and calling
+   * a towel "boring" is the same kind of mismatch as calling it happy). */
   var COMPARE_TRAITS = [
     { id: 'expensive', icon: '💸', en: '…but it’s expensive!', ja: 'でも、{opt}は ちょっと たかいです。' },
-    { id: 'far', icon: '🚶', en: '…but it’s far away!', ja: 'でも、{opt}は とおくに あります。' },
+    { id: 'lovely', icon: '✨', en: '…and it’s lovely!', ja: 'そして、{opt}は とても すてきです！' },
     { id: 'popular', icon: '⭐', en: '…and it’s very popular!', ja: 'そして、{opt}は とても にんきです！' },
     { id: 'rare', icon: '🦄', en: '…but it’s hard to find!', ja: 'でも、{opt}は みつけにくいです。' },
     { id: 'perfect', icon: '💯', en: '…it’s perfect!', ja: 'そして、{opt}は かんぺきです！' },
-    { id: 'boring', icon: '😐', en: '…a little boring, though.', ja: 'でも、{opt}は ちょっと つまらないです。' }
+    { id: 'meh', icon: '😐', en: '…kind of so-so, though.', ja: 'でも、{opt}は ちょっと びみょうです。' }
   ];
 
   /* Compare's own fixed target grammar - these name the two options
@@ -2747,6 +2754,14 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
   /* ---------- navigation ---------- */
   Story.prototype.currentStep = function () { return this.steps[this.i] || null; };
 
+  /* Steps already built stay in this.steps forever (advance() below only
+   * ever builds more, never discards), so moving back is just moving the
+   * cursor - no rebuilding, and nothing about the step itself changes. */
+  Story.prototype.back = function () {
+    if (this.i > 0) this.i--;
+    return this.currentStep();
+  };
+
   Story.prototype.advance = function () {
     if (this.i < this.steps.length - 1) { this.i++; return this.currentStep(); }
     while (this.beat < this.beatNames.length) {
@@ -3301,14 +3316,21 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
   function step(s) {
     var body = $('#play-body');
     body.innerHTML = '';
+    var backBtn = $('#back-step');
+    if (backBtn) backBtn.disabled = !story || story.i <= 0;
     if (!s) { renderRecap(); return; }
 
     renderStage(s);
     renderMeters();
 
+    /* Re-visiting an already-answered choice or already-circled drill (via
+     * the back button) must not let the class re-pick or re-score it -
+     * story.answer() already no-ops on a re-pick, but re-rendering the
+     * interactive version invites clicking it anyway. Show a read-only
+     * recap of it instead, with its own way back to the frontier. */
     if (s.kind === 'say') return renderSay(s, body);
-    if (s.kind === 'choose') return renderChoose(s, body);
-    if (s.kind === 'circle') return renderCircle(s, body);
+    if (s.kind === 'choose') return s.answered ? renderChooseReview(s, body) : renderChoose(s, body);
+    if (s.kind === 'circle') return s.done ? renderCircleReview(s, body) : renderCircle(s, body);
     if (s.kind === 'recap') return renderRecap();
   }
 
@@ -3385,13 +3407,59 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     if (ui.autoSpeak) setTimeout(function () { speakTokens(s.q); }, 260);
   }
 
+  /* Read-only view of a choice already made, shown when the back button
+   * revisits it - the picked option stays marked, everything is disabled,
+   * and "next" just moves the cursor forward again (story.advance()),
+   * never story.answer(), which would re-run onPick's side effects. */
+  function renderChooseReview(s, body) {
+    var q = el('div', 'question');
+    q.innerHTML = '<span class="q-tag">きめて！ your choice</span>';
+    var qh = el('div', 'q-jp jp', line(s.q));
+    q.appendChild(qh);
+    qh.appendChild(speakBtn(s.q));
+    if (s.qEn) q.appendChild(el('div', 'q-en', R.escapeHtml(s.qEn)));
+
+    var opts = el('div', 'options');
+    var matched = false;
+    s.options.forEach(function (o, idx) {
+      var picked = o === s.answered;
+      if (picked) matched = true;
+      var b = el('button', 'opt' + (picked ? ' correct' : ''));
+      b.type = 'button';
+      b.disabled = true;
+      b.innerHTML =
+        (o.avatar ? '<span class="opt-avatar">' + art.actor(o.avatar, 'happy', '') + '</span>'
+                  : '<span class="opt-icon">' + R.escapeHtml(o.icon || '⭐') + '</span>') +
+        '<span class="opt-jp jp">' + line(o.tk) + '</span>' +
+        (o.en ? '<span class="opt-en">' + R.escapeHtml(o.en) + '</span>' : '');
+      b.dataset.key = String(idx + 1);
+      opts.appendChild(b);
+    });
+    q.appendChild(opts);
+
+    if (!matched && s.answered) {
+      var echo = el('div', 'echo');
+      echo.innerHTML = '<span class="echo-tag">じぶんで かいた (your own answer)</span>' +
+        '<span class="jp">' + line(s.answered.tk) + '</span>';
+      q.appendChild(echo);
+    }
+
+    body.appendChild(q);
+    var next = el('button', 'btn big', 'つぎへ ▶');
+    next.onclick = function () { step(story.advance()); };
+    var row = el('div', 'row'); row.style.marginTop = '1rem';
+    row.appendChild(next);
+    body.appendChild(row);
+    focusNext(next);
+  }
+
   function renderCircle(s, body) {
     var idx = 0;
 
     function drawQuestion() {
       body.innerHTML = '';
       var qn = s.questions[idx];
-      if (!qn) { step(story.advance()); return; }
+      if (!qn) { s.done = true; step(story.advance()); return; }
 
       var q = el('div', 'question');
       q.innerHTML = '<span class="q-tag ' + (qn.spiral ? 'spiral' : 'drill') + '">' +
@@ -3449,6 +3517,28 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     }
 
     drawQuestion();
+  }
+
+  /* Read-only view of a drill already fully answered, shown when the back
+   * button revisits it - just the sentences it circled, no clickable
+   * questions (re-answering would score it a second time). */
+  function renderCircleReview(s, body) {
+    var q = el('div', 'question');
+    q.innerHTML = '<span class="q-tag drill">' + R.escapeHtml(s.label || 'しつもん') + ' — already circled</span>';
+    var list = el('div', 'story-lines');
+    s.questions.forEach(function (qn) {
+      var row = el('div', 'story-line');
+      row.appendChild(el('div', 'txt jp', line(qn.echo)));
+      list.appendChild(row);
+    });
+    q.appendChild(list);
+    body.appendChild(q);
+    var next = el('button', 'btn big', 'つぎへ ▶');
+    next.onclick = function () { step(story.advance()); };
+    var row2 = el('div', 'row'); row2.style.marginTop = '1rem';
+    row2.appendChild(next);
+    body.appendChild(row2);
+    focusNext(next);
   }
 
   function focusNext(btn) {
@@ -3594,6 +3684,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     $('#start').onclick = startStory;
     $('#back-setup').onclick = function () { audio.stop(); show('setup'); };
     $('#brand-home').onclick = function () { audio.stop(); show('setup'); };
+    $('#back-step').onclick = function () { if (story) step(story.back()); };
     $('#circling').onchange = function () { ui.level = this.value; applyUi(); };
     $('#share').onclick = function () {
       var url = shareLink();
@@ -3604,8 +3695,12 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       } catch (e) { window.prompt('Copy this link:', url); }
     };
     $('#reset').onclick = function () {
-      if (!window.confirm('Reset the word lists back to the starter pack?')) return;
-      config = cloneConfig(D.DEFAULT_CONFIG);
+      if (!window.confirm('Reset the word lists back to this pack\'s built-in defaults?')) return;
+      /* Reset to whichever pack is actually selected, not always the
+       * starter pack - this also doubles as "give me the latest built-in
+       * version" for a pack a browser saved a copy of a while ago. */
+      var current = D.PRESETS.filter(function (p) { return p.id === ui.preset; })[0];
+      config = cloneConfig(current ? current.config : D.DEFAULT_CONFIG);
       saveConfig(); renderSetup();
     };
 
@@ -3614,6 +3709,11 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') {
         var next = $('#play-body .btn.big') || $('#play-body .btn');
         if (next) { e.preventDefault(); next.click(); }
+        return;
+      }
+      if (e.key === 'ArrowLeft') {
+        var back = $('#back-step');
+        if (back && !back.disabled) { e.preventDefault(); back.click(); }
         return;
       }
       if (/^[1-4]$/.test(e.key)) {
