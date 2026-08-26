@@ -117,12 +117,13 @@
 
     $('#title').value = config.title || '';
 
-    /* target structures */
+    /* target structures: normally fixed by the word pack, but a skeleton
+     * with its own grammar shape (like compare's A/B comparisons) overrides
+     * that with its own fixed set instead. */
     var t = $('#targets');
     t.innerHTML = '';
-    for (var i = 0; i < 3; i++) {
-      t.appendChild(targetRow(i));
-    }
+    var activeTargets = (ui.skeleton === 'compare') ? D.COMPARE_TARGETS : (config.targets || []);
+    activeTargets.forEach(function (tmpl, i) { t.appendChild(targetRow(i, tmpl)); });
 
     renderVocab();
     $('#circling').value = ui.level;
@@ -147,10 +148,9 @@
 
   /* Target grammar is fixed per word pack, not teacher-editable — this just
    * displays the pack's own structure. */
-  function targetRow(i) {
+  function targetRow(i, tmpl) {
     var wrap = el('div', 'target-row');
     wrap.appendChild(el('div', 'idx', String(i + 1)));
-    var tmpl = (config.targets && config.targets[i]) || '';
     var prev = el('div', 'preview jp');
     if (tmpl) prev.innerHTML = line(templateShapeTokens(tmpl));
     wrap.appendChild(prev);

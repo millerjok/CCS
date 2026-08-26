@@ -101,7 +101,12 @@ goes looking for it twice and fails both times, then someone helps.
 
 **どちらが いい？ (compare)** — two options get introduced one at a time,
 each with a pro/con twist, then the class commits to a winner and finds out
-how it turns out.
+how it turns out. Compare has its own fixed target grammar (built in, not
+from the word pack): comparative (`A より、B のほうが〜`), contrastive
+(`A と ちがって、B は〜`), similarity (`A と 同じく、B は〜`) once both
+options are known, and superlative (`〜が 一番〜`) once a winner is chosen —
+because "two options" is a grammar shape of its own, not a fill-in-the-blank
+a word pack can express with one slot.
 
 **３つの よてい (journey)** — three stops in a row. Nothing carries forward
 as a failure; each stop gets its own small (mostly upbeat) event resolved on
@@ -112,27 +117,38 @@ three suspects (one is secretly guilty, decided at random) and guesses
 "suspicious or not" for each — scored against who actually did it — before
 a detective makes the final accusation.
 
-Whichever shape is picked, the same three target-structure boxes from step 3
-get recited through the story — twice each for the two "attempt"-style
-skeletons (classic, compare), across the three stops or three suspects for
-the others. Write target structures that suit the shape you're using: a
-`{ばしょ}に 行きます` target written for classic will still work under
-compare, but it'll get filled with a random place having nothing to do with
-the comparison — grammatically fine, just a bonus rep rather than a plot
-point. That's true of classic's own targets too whenever a mismatch happens;
-it's normal, not a bug.
+For classic, journey and mystery, the word pack's own target structures from
+step 3 get recited through the story — twice each across the two "attempt"
+scenes for classic, across the three stops or three suspects for the others.
+A pack can define more than 3 targets (the Hiroshima pack ships 5, one per
+grammar point); classic circles a 4th and 5th too, tied to its two "goes
+somewhere" scenes, while journey and mystery only ever circle the first 3.
+Compare ignores the word pack's own targets entirely and always uses its
+own four comparison structures instead (see above) — so a pack's own
+targets can be written without worrying about how they'd read as a
+comparison.
+
+A mismatch between a target's slot and what a given moment in the story is
+actually about (e.g. a `{ばしょ}` target getting filled with a random place
+that has nothing to do with the immediate scene) is normal, not a bug —
+it just becomes a bonus rep rather than a plot point.
 
 ---
 
 ## Target structures
 
-Each word pack ships with its own 2–3 target structures — these are fixed and shown
-read-only in Setup step 3, with a real example filled in from that pack's word lists, so a
-teacher can see exactly what the class will hear without being able to break the grammar
-by accident. Switching to a different word pack drills different structures.
+Each word pack ships with its own target structures — these are fixed and shown
+read-only in Setup step 3, labelled by category (e.g. `(Places)に 行きます`) rather than
+with one specific word, so a teacher can see the shape of what the class will hear
+without being able to break the grammar by accident. Switching to a different word
+pack drills different structures; picking compare as the story shape overrides them
+entirely with compare's own built-in comparison grammar (see "Story shapes" above).
 
 To change what a pack drills, or add a new pack, edit `PRESETS` in `js/data.js` directly.
-Each target is a phrase with slots in curly brackets, filled from the pack's word lists:
+Each target is a phrase with slots in curly brackets, filled from the pack's word lists.
+Two or three targets is typical; classic will also circle a 4th and 5th if a pack defines
+them (journey and mystery only ever circle the first 3) — see the `hiroshima` pack for
+an example with 5, one per grammar point it teaches.
 
 | Slot | Comes from |
 |---|---|

@@ -197,6 +197,38 @@
                      v('すばらしい', 'すばらしい', 'wonderful', '🌟'), v('うれしい', 'うれしい', 'happy', '😄')]
         }
       }
+    },
+    {
+      id: 'hiroshima',
+      name: '広島',
+      en: 'Hiroshima Trip (email home)',
+      icon: '⛩️',
+      config: {
+        title: '広島への たび',
+        targets: [
+          '{ひと}が {もの}について 説明[せつめい]してくれました',
+          '明日[あした]は {ばしょ}に 行[い]く 予定[よてい]です',
+          '{もの}を 買[か]う つもりです',
+          '{ばしょ}に 着[つ]いたら、{どうし}',
+          '{ばしょ}に いる 間[あいだ]に、{どうし}'
+        ],
+        vocab: {
+          people: [v('家族', 'かぞく', 'family', '👪'), v('ガイド', 'ガイド', 'guide', '🗺️'),
+                   v('友だち', 'ともだち', 'friend', '🧑‍🤝‍🧑'), v('観光客', 'かんこうきゃく', 'tourist', '📸'),
+                   v('地元の人', 'じもとの ひと', 'local person', '🧑'), v('先生', 'せんせい', 'teacher', '👩‍🏫')],
+          places: [v('広島', 'ひろしま', 'Hiroshima', '🗾'), v('平和記念公園', 'へいわきねんこうえん', 'Peace Memorial Park', '🕊️'),
+                   v('ホテル', 'ホテル', 'hotel', '🏨'), v('宮島', 'みやじま', 'Miyajima', '🚢'),
+                   v('神社', 'じんじゃ', 'shrine', '⛩️'), v('伝統工芸の店', 'でんとうこうげいの みせ', 'traditional crafts shop', '🏮')],
+          things: [v('タオル', 'タオル', 'towel', '🧺'), v('シーツ', 'シーツ', 'sheets', '🛏️'),
+                   v('お好み焼き', 'おこのみやき', 'okonomiyaki', '🥞'), v('筆', 'ふで', '(calligraphy) brush', '🖌️'),
+                   v('写真', 'しゃしん', 'photo', '📷'), v('おみやげ', 'おみやげ', 'souvenir', '🎁')],
+          actions: [v('説明します', 'せつめいします', 'explains', '🗣️'), v('買います', 'かいます', 'buys', '🛍️'),
+                    v('撮ります', 'とります', 'takes (a photo)', '📷'), v('始めます', 'はじめます', 'starts', '🎬'),
+                    v('話します', 'はなします', 'talks', '💬')],
+          feelings: [v('うれしい', 'うれしい', 'happy', '😄'), v('たのしい', 'たのしい', 'fun', '😆'),
+                     v('しんせつ', 'しんせつ', 'kind', '🤝'), v('ゆうめい', 'ゆうめい', 'famous', '⭐')]
+        }
+      }
     }
   ];
 
@@ -267,6 +299,16 @@
     { id: 'rare', icon: '🦄', en: '…but it’s hard to find!', ja: 'でも、{opt}は みつけにくいです。' },
     { id: 'perfect', icon: '💯', en: '…it’s perfect!', ja: 'そして、{opt}は かんぺきです！' },
     { id: 'boring', icon: '😐', en: '…a little boring, though.', ja: 'でも、{opt}は ちょっと つまらないです。' }
+  ];
+
+  /* Compare's own fixed target grammar - these name the two options
+   * directly (A/B) instead of pulling from one vocab slot, so they read as
+   * actual comparisons rather than two unrelated single-item sentences. */
+  var COMPARE_TARGETS = [
+    '{A}より、{B}のほうが {きもち}です',
+    '{もの}が 一番[いちばん] {きもち}です',
+    '{A}と ちがって、{B}は {きもち}です',
+    '{A}と 同[おな]じく、{B}は {きもち}です'
   ];
 
   var COMPARE_OUTCOMES = [
@@ -453,6 +495,7 @@
     SKELETONS: SKELETONS,
     COMPARE_TRAITS: COMPARE_TRAITS,
     COMPARE_OUTCOMES: COMPARE_OUTCOMES,
+    COMPARE_TARGETS: COMPARE_TARGETS,
     JOURNEY_EVENTS: JOURNEY_EVENTS,
     MYSTERY_CLUES: MYSTERY_CLUES,
     sceneKindFor: sceneKindFor,

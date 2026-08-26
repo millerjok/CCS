@@ -298,6 +298,11 @@
           self.nameEn() + ' goes to the ' + (opt.item.e || opt.item.w) + '.',
           { who: 'narrator', scene: self.st.scene, icon: opt.icon, sfx: 'flip' });
         self.speakTarget(1, opt.item, 'happy');
+        /* A pack can define more than 3 targets (e.g. one per grammar point
+         * it's teaching) - speakTarget no-ops past the end of a shorter
+         * array, so this is a no-op for every pack that only has 3. */
+        self.speakTarget(3, opt.item, 'happy');
+        self.speakTarget(4, opt.item, 'happy');
         self.round('goes', self.nameTk(), self.nameEn(), opt.item, 'places', 'ばしょ ' + n);
 
         /* now the failure */
@@ -429,6 +434,30 @@
    * charming pro/con twist, then the class commits to a winner. Hero/name
    * are identical to the classic skeleton, so those two beats just reuse it.
    */
+  /* Compare's own fixed target grammar (D.COMPARE_TARGETS) names the two
+   * options directly via {A}/{B}, so it can't go through parseTarget/
+   * speakTarget above - those only know how to fill one vocab-category
+   * slot at a time. `map` supplies real tokens for whichever of {A}, {B},
+   * {もの}, {きもち} the template uses. */
+  Story.prototype.speakCompareTarget = function (index, map, enText, icon) {
+    var tpl = D.COMPARE_TARGETS[index];
+    if (!tpl) return;
+    this.say(J(JP.fill(tpl, map), '！'), enText || '',
+      { who: 'hero', mood: this.st.mood, target: true, icon: icon || '' });
+    this.drill([{
+      type: 'yn',
+      prompt: J(JP.fill(tpl, map), 'か。'),
+      en: 'True or not?',
+      choices: [
+        { tk: R.parse('はい、そうです'), icon: '⭕', correct: true },
+        { tk: R.parse('いいえ、ちがいます'), icon: '❌', correct: false }
+      ],
+      echo: JP.fill(tpl, map),
+      focus: null,
+      target: true
+    }], 'ターゲット');
+  };
+
   Story.prototype.buildCompareBeat = function (name) {
     var self = this;
     if (name === 'hero' || name === 'name') return this.buildClassicBeat(name);
@@ -449,7 +478,6 @@
           self.say(J(self.nameTk(), 'は ', tk(opt.item), 'が いいと 思[おも]いました。'),
             self.nameEn() + ' thought ' + (opt.item.e || opt.item.w) + ' might be good.',
             { who: 'narrator', mood: 'excited', icon: opt.icon, sfx: 'flip' });
-          self.speakTarget(0, opt.item, 'excited');
           self.round('wants', self.nameTk(), self.nameEn(), opt.item, 'things', isA ? '１つ目' : '２つ目');
 
           var card = JP.pick(D.COMPARE_TRAITS);
@@ -470,7 +498,22 @@
                 (opt.item.e || opt.item.w) + ' seems very ' + (fopt.item.e || fopt.item.w) + '.',
                 { who: 'hero', mood: self.st.mood, icon: fopt.icon });
               self.round('feels', tk(opt.item), opt.item.e || opt.item.w, fopt.item, 'feelings', isA ? 'とくちょう１' : 'とくちょう２');
-              self.speakTarget(1, fopt.item, self.st.mood);
+
+              /* Both options and both feelings are now known - this is the
+               * moment to actually compare them, rather than repeat two
+               * separate single-item sentences. */
+              if (!isA) {
+                var A = self.st.optionA, B = self.st.optionB;
+                var feelA = self.st.feelingA, feelB = self.st.feelingB;
+                var cmpMap = { A: tk(A), B: tk(B), きもち: tk(feelB) };
+                var bEn = B.e || B.w, aEn = A.e || A.w, feelEn = feelB.e || feelB.w;
+                self.speakCompareTarget(0, cmpMap,
+                  bEn + ' is more ' + feelEn + ' than ' + aEn + '.', D.guessIcon(B, 'things'));
+                self.speakCompareTarget(2, cmpMap,
+                  'Unlike ' + aEn + ', ' + bEn + ' is ' + feelEn + '.', D.guessIcon(B, 'things'));
+                self.speakCompareTarget(3, cmpMap,
+                  'Just like ' + aEn + ', ' + bEn + ' is ' + feelEn + '.', D.guessIcon(B, 'things'));
+              }
             }
           });
         }
@@ -493,7 +536,10 @@
           self.say(J(self.nameTk(), 'は 「', tk(opt.item), 'に します！」と 言[い]いました。'),
             self.nameEn() + ' said, "I choose ' + (opt.item.e || opt.item.w) + '!"',
             { who: 'hero', mood: 'excited', icon: opt.icon, sfx: 'flip' });
-          self.speakTarget(2, opt.item, 'excited');
+          var winnerFeeling = (opt.item.w === self.st.optionA.w) ? self.st.feelingA : self.st.feelingB;
+          self.speakCompareTarget(1, { もの: tk(opt.item), きもち: tk(winnerFeeling) },
+            (opt.item.e || opt.item.w) + ' is the most ' + (winnerFeeling.e || winnerFeeling.w) + '.',
+            D.guessIcon(opt.item, 'things'));
           self.round('wants', self.nameTk(), self.nameEn(), opt.item, 'things', 'けってい');
         }
       });

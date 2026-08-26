@@ -361,8 +361,8 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     <div class="card">
       <h2><span class="num">3</span>Target grammar</h2>
       <div class="sub">
-        The 2–3 structures this word pack drills. These come fixed with the pack —
-        pick a different word pack above for different structures.
+        The structures this lesson drills — fixed by the word pack, except for a story
+        shape with its own built-in grammar (like どちらが いい？'s comparisons above).
       </div>
       <div class="targets" id="targets"></div>
       <div class="row" style="margin-top:1rem">
@@ -786,6 +786,38 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
                      v('すばらしい', 'すばらしい', 'wonderful', '🌟'), v('うれしい', 'うれしい', 'happy', '😄')]
         }
       }
+    },
+    {
+      id: 'hiroshima',
+      name: '広島',
+      en: 'Hiroshima Trip (email home)',
+      icon: '⛩️',
+      config: {
+        title: '広島への たび',
+        targets: [
+          '{ひと}が {もの}について 説明[せつめい]してくれました',
+          '明日[あした]は {ばしょ}に 行[い]く 予定[よてい]です',
+          '{もの}を 買[か]う つもりです',
+          '{ばしょ}に 着[つ]いたら、{どうし}',
+          '{ばしょ}に いる 間[あいだ]に、{どうし}'
+        ],
+        vocab: {
+          people: [v('家族', 'かぞく', 'family', '👪'), v('ガイド', 'ガイド', 'guide', '🗺️'),
+                   v('友だち', 'ともだち', 'friend', '🧑‍🤝‍🧑'), v('観光客', 'かんこうきゃく', 'tourist', '📸'),
+                   v('地元の人', 'じもとの ひと', 'local person', '🧑'), v('先生', 'せんせい', 'teacher', '👩‍🏫')],
+          places: [v('広島', 'ひろしま', 'Hiroshima', '🗾'), v('平和記念公園', 'へいわきねんこうえん', 'Peace Memorial Park', '🕊️'),
+                   v('ホテル', 'ホテル', 'hotel', '🏨'), v('宮島', 'みやじま', 'Miyajima', '🚢'),
+                   v('神社', 'じんじゃ', 'shrine', '⛩️'), v('伝統工芸の店', 'でんとうこうげいの みせ', 'traditional crafts shop', '🏮')],
+          things: [v('タオル', 'タオル', 'towel', '🧺'), v('シーツ', 'シーツ', 'sheets', '🛏️'),
+                   v('お好み焼き', 'おこのみやき', 'okonomiyaki', '🥞'), v('筆', 'ふで', '(calligraphy) brush', '🖌️'),
+                   v('写真', 'しゃしん', 'photo', '📷'), v('おみやげ', 'おみやげ', 'souvenir', '🎁')],
+          actions: [v('説明します', 'せつめいします', 'explains', '🗣️'), v('買います', 'かいます', 'buys', '🛍️'),
+                    v('撮ります', 'とります', 'takes (a photo)', '📷'), v('始めます', 'はじめます', 'starts', '🎬'),
+                    v('話します', 'はなします', 'talks', '💬')],
+          feelings: [v('うれしい', 'うれしい', 'happy', '😄'), v('たのしい', 'たのしい', 'fun', '😆'),
+                     v('しんせつ', 'しんせつ', 'kind', '🤝'), v('ゆうめい', 'ゆうめい', 'famous', '⭐')]
+        }
+      }
     }
   ];
 
@@ -856,6 +888,16 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     { id: 'rare', icon: '🦄', en: '…but it’s hard to find!', ja: 'でも、{opt}は みつけにくいです。' },
     { id: 'perfect', icon: '💯', en: '…it’s perfect!', ja: 'そして、{opt}は かんぺきです！' },
     { id: 'boring', icon: '😐', en: '…a little boring, though.', ja: 'でも、{opt}は ちょっと つまらないです。' }
+  ];
+
+  /* Compare's own fixed target grammar - these name the two options
+   * directly (A/B) instead of pulling from one vocab slot, so they read as
+   * actual comparisons rather than two unrelated single-item sentences. */
+  var COMPARE_TARGETS = [
+    '{A}より、{B}のほうが {きもち}です',
+    '{もの}が 一番[いちばん] {きもち}です',
+    '{A}と ちがって、{B}は {きもち}です',
+    '{A}と 同[おな]じく、{B}は {きもち}です'
   ];
 
   var COMPARE_OUTCOMES = [
@@ -1042,6 +1084,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     SKELETONS: SKELETONS,
     COMPARE_TRAITS: COMPARE_TRAITS,
     COMPARE_OUTCOMES: COMPARE_OUTCOMES,
+    COMPARE_TARGETS: COMPARE_TARGETS,
     JOURNEY_EVENTS: JOURNEY_EVENTS,
     MYSTERY_CLUES: MYSTERY_CLUES,
     sceneKindFor: sceneKindFor,
@@ -2157,6 +2200,11 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
           self.nameEn() + ' goes to the ' + (opt.item.e || opt.item.w) + '.',
           { who: 'narrator', scene: self.st.scene, icon: opt.icon, sfx: 'flip' });
         self.speakTarget(1, opt.item, 'happy');
+        /* A pack can define more than 3 targets (e.g. one per grammar point
+         * it's teaching) - speakTarget no-ops past the end of a shorter
+         * array, so this is a no-op for every pack that only has 3. */
+        self.speakTarget(3, opt.item, 'happy');
+        self.speakTarget(4, opt.item, 'happy');
         self.round('goes', self.nameTk(), self.nameEn(), opt.item, 'places', 'ばしょ ' + n);
 
         /* now the failure */
@@ -2288,6 +2336,30 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
    * charming pro/con twist, then the class commits to a winner. Hero/name
    * are identical to the classic skeleton, so those two beats just reuse it.
    */
+  /* Compare's own fixed target grammar (D.COMPARE_TARGETS) names the two
+   * options directly via {A}/{B}, so it can't go through parseTarget/
+   * speakTarget above - those only know how to fill one vocab-category
+   * slot at a time. `map` supplies real tokens for whichever of {A}, {B},
+   * {もの}, {きもち} the template uses. */
+  Story.prototype.speakCompareTarget = function (index, map, enText, icon) {
+    var tpl = D.COMPARE_TARGETS[index];
+    if (!tpl) return;
+    this.say(J(JP.fill(tpl, map), '！'), enText || '',
+      { who: 'hero', mood: this.st.mood, target: true, icon: icon || '' });
+    this.drill([{
+      type: 'yn',
+      prompt: J(JP.fill(tpl, map), 'か。'),
+      en: 'True or not?',
+      choices: [
+        { tk: R.parse('はい、そうです'), icon: '⭕', correct: true },
+        { tk: R.parse('いいえ、ちがいます'), icon: '❌', correct: false }
+      ],
+      echo: JP.fill(tpl, map),
+      focus: null,
+      target: true
+    }], 'ターゲット');
+  };
+
   Story.prototype.buildCompareBeat = function (name) {
     var self = this;
     if (name === 'hero' || name === 'name') return this.buildClassicBeat(name);
@@ -2308,7 +2380,6 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
           self.say(J(self.nameTk(), 'は ', tk(opt.item), 'が いいと 思[おも]いました。'),
             self.nameEn() + ' thought ' + (opt.item.e || opt.item.w) + ' might be good.',
             { who: 'narrator', mood: 'excited', icon: opt.icon, sfx: 'flip' });
-          self.speakTarget(0, opt.item, 'excited');
           self.round('wants', self.nameTk(), self.nameEn(), opt.item, 'things', isA ? '１つ目' : '２つ目');
 
           var card = JP.pick(D.COMPARE_TRAITS);
@@ -2329,7 +2400,22 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
                 (opt.item.e || opt.item.w) + ' seems very ' + (fopt.item.e || fopt.item.w) + '.',
                 { who: 'hero', mood: self.st.mood, icon: fopt.icon });
               self.round('feels', tk(opt.item), opt.item.e || opt.item.w, fopt.item, 'feelings', isA ? 'とくちょう１' : 'とくちょう２');
-              self.speakTarget(1, fopt.item, self.st.mood);
+
+              /* Both options and both feelings are now known - this is the
+               * moment to actually compare them, rather than repeat two
+               * separate single-item sentences. */
+              if (!isA) {
+                var A = self.st.optionA, B = self.st.optionB;
+                var feelA = self.st.feelingA, feelB = self.st.feelingB;
+                var cmpMap = { A: tk(A), B: tk(B), きもち: tk(feelB) };
+                var bEn = B.e || B.w, aEn = A.e || A.w, feelEn = feelB.e || feelB.w;
+                self.speakCompareTarget(0, cmpMap,
+                  bEn + ' is more ' + feelEn + ' than ' + aEn + '.', D.guessIcon(B, 'things'));
+                self.speakCompareTarget(2, cmpMap,
+                  'Unlike ' + aEn + ', ' + bEn + ' is ' + feelEn + '.', D.guessIcon(B, 'things'));
+                self.speakCompareTarget(3, cmpMap,
+                  'Just like ' + aEn + ', ' + bEn + ' is ' + feelEn + '.', D.guessIcon(B, 'things'));
+              }
             }
           });
         }
@@ -2352,7 +2438,10 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
           self.say(J(self.nameTk(), 'は 「', tk(opt.item), 'に します！」と 言[い]いました。'),
             self.nameEn() + ' said, "I choose ' + (opt.item.e || opt.item.w) + '!"',
             { who: 'hero', mood: 'excited', icon: opt.icon, sfx: 'flip' });
-          self.speakTarget(2, opt.item, 'excited');
+          var winnerFeeling = (opt.item.w === self.st.optionA.w) ? self.st.feelingA : self.st.feelingB;
+          self.speakCompareTarget(1, { もの: tk(opt.item), きもち: tk(winnerFeeling) },
+            (opt.item.e || opt.item.w) + ' is the most ' + (winnerFeeling.e || winnerFeeling.w) + '.',
+            D.guessIcon(opt.item, 'things'));
           self.round('wants', self.nameTk(), self.nameEn(), opt.item, 'things', 'けってい');
         }
       });
@@ -2906,12 +2995,13 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
 
     $('#title').value = config.title || '';
 
-    /* target structures */
+    /* target structures: normally fixed by the word pack, but a skeleton
+     * with its own grammar shape (like compare's A/B comparisons) overrides
+     * that with its own fixed set instead. */
     var t = $('#targets');
     t.innerHTML = '';
-    for (var i = 0; i < 3; i++) {
-      t.appendChild(targetRow(i));
-    }
+    var activeTargets = (ui.skeleton === 'compare') ? D.COMPARE_TARGETS : (config.targets || []);
+    activeTargets.forEach(function (tmpl, i) { t.appendChild(targetRow(i, tmpl)); });
 
     renderVocab();
     $('#circling').value = ui.level;
@@ -2936,10 +3026,9 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
 
   /* Target grammar is fixed per word pack, not teacher-editable — this just
    * displays the pack's own structure. */
-  function targetRow(i) {
+  function targetRow(i, tmpl) {
     var wrap = el('div', 'target-row');
     wrap.appendChild(el('div', 'idx', String(i + 1)));
-    var tmpl = (config.targets && config.targets[i]) || '';
     var prev = el('div', 'preview jp');
     if (tmpl) prev.innerHTML = line(templateShapeTokens(tmpl));
     wrap.appendChild(prev);
