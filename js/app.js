@@ -7,37 +7,6 @@
 
   var R = ns.ruby, D = ns.data, JP = ns.jp, art = ns.art, audio = ns.audio, cloud = ns.cloud;
 
-  /* Target-grammar slot picker: a category dropdown instead of typed {} */
-  var SLOT_OPTIONS = [
-    { key: 'もの', label: 'もの (things)' },
-    { key: 'ばしょ', label: 'ばしょ (places)' },
-    { key: 'ひと', label: 'ひと (people)' },
-    { key: 'どうし', label: 'どうし (verbs)' },
-    { key: 'きもち', label: 'きもち (feelings)' }
-  ];
-  var CAT_TO_SLOT = { things: 'もの', places: 'ばしょ', people: 'ひと', actions: 'どうし', feelings: 'きもち' };
-
-  function normalizeSlotKey(raw) {
-    var cat = D.SLOTS[(raw || '').trim()];
-    return CAT_TO_SLOT[cat] || 'もの';
-  }
-
-  /* "{もの}を 作[つく]ります" -> [{type:'text',value:''}, {type:'slot',cat:'もの'}, {type:'text',value:'を 作[つく]ります'}] */
-  function templateToSegments(str) {
-    var segs = [], last = 0, m, re = /\{([^}]+)\}/g;
-    str = str || '';
-    while ((m = re.exec(str)) !== null) {
-      if (m.index > last) segs.push({ type: 'text', value: str.slice(last, m.index) });
-      segs.push({ type: 'slot', cat: normalizeSlotKey(m[1]) });
-      last = m.index + m[0].length;
-    }
-    if (last < str.length || !segs.length) segs.push({ type: 'text', value: str.slice(last) });
-    return segs;
-  }
-
-  function segmentsToTemplate(segs) {
-    return segs.map(function (s) { return s.type === 'slot' ? '{' + s.cat + '}' : s.value; }).join('');
-  }
   var STORE = 'ccs.config.v2';
 
   var config = null;
@@ -160,96 +129,15 @@
     if (cloud && cloud.enabled()) renderCloudPublish();
   }
 
+  /* Target grammar is fixed per word pack, not teacher-editable — this just
+   * displays the pack's own structure with a real example filled in. */
   function targetRow(i) {
-    var wrap = el('div');
-    var row = el('div', 'target-row');
-    row.appendChild(el('div', 'idx', String(i + 1)));
-
-    var builder = el('div', 'target-builder');
-    row.appendChild(builder);
-    wrap.appendChild(row);
-
+    var wrap = el('div', 'target-row');
+    wrap.appendChild(el('div', 'idx', String(i + 1)));
+    var tmpl = (config.targets && config.targets[i]) || '';
     var prev = el('div', 'preview jp');
+    if (tmpl) prev.innerHTML = line(JP.parseTarget(tmpl, config.vocab).build(null));
     wrap.appendChild(prev);
-
-    var hintText = i === 0 ? 'e.g. {もの}が ほしいです' : i === 1 ? 'e.g. {ばしょ}に 行[い]きます' : 'e.g. でも、ありません';
-    wrap.appendChild(el('div', 'meter', hintText));
-
-    var segments = templateToSegments((config.targets && config.targets[i]) || '');
-
-    function commit() {
-      config.targets = config.targets || [];
-      config.targets[i] = segmentsToTemplate(segments);
-      /* Preview with real words in the slots so the teacher sees what the class will hear */
-      prev.innerHTML = line(JP.parseTarget(config.targets[i], config.vocab).build(null));
-      saveConfig();
-    }
-
-    function render() {
-      builder.innerHTML = '';
-      segments.forEach(function (seg, idx) {
-        if (seg.type === 'text') {
-          var t = el('input');
-          t.type = 'text';
-          t.className = 'slot-text';
-          t.value = seg.value;
-          t.size = Math.max(3, seg.value.length || (segments.length === 1 ? 18 : 3));
-          t.placeholder = segments.length === 1 ? 'Japanese words…' : '';
-          t.oninput = function () { seg.value = t.value; t.size = Math.max(3, t.value.length); commit(); };
-          builder.appendChild(t);
-        } else {
-          var pill = el('span', 'slot-pill');
-          var sel = el('select', 'slot-select');
-          SLOT_OPTIONS.forEach(function (o) {
-            var opt = document.createElement('option');
-            opt.value = o.key;
-            opt.textContent = o.label;
-            if (o.key === seg.cat) opt.selected = true;
-            sel.appendChild(opt);
-          });
-          sel.onchange = function () { seg.cat = sel.value; commit(); };
-          pill.appendChild(sel);
-          var rm = el('button', 'slot-remove', '✕');
-          rm.type = 'button';
-          rm.title = 'Remove this slot';
-          rm.onclick = function () {
-            segments.splice(idx, 1);
-            if (!segments.length) segments.push({ type: 'text', value: '' });
-            render();
-            commit();
-          };
-          pill.appendChild(rm);
-          builder.appendChild(pill);
-        }
-      });
-
-      var addBtn = el('button', 'chip', '+ slot');
-      addBtn.type = 'button';
-      addBtn.onclick = function () {
-        segments.push({ type: 'slot', cat: 'もの' });
-        segments.push({ type: 'text', value: '' });
-        render();
-        commit();
-      };
-      builder.appendChild(addBtn);
-
-      var ruby = el('button', 'chip', '漢字[かんじ] furigana');
-      ruby.type = 'button';
-      ruby.onclick = function () {
-        var last = segments[segments.length - 1];
-        if (!last || last.type !== 'text') {
-          last = { type: 'text', value: '' };
-          segments.push(last);
-        }
-        last.value += '学校[がっこう]';
-        render();
-        commit();
-      };
-      builder.appendChild(ruby);
-    }
-
-    render();
-    commit();
     return wrap;
   }
 

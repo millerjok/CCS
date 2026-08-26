@@ -120,12 +120,13 @@ body.furi-off ruby rt { opacity: 0; }
 .preset .pn { font-weight: 800; font-size: 1.05rem; }
 .preset .pe { color: var(--ink-soft); font-size: .8rem; }
 
-.targets { display: grid; gap: .7rem; }
-.target-row { display: flex; gap: .6rem; align-items: flex-start; }
+.targets { display: grid; gap: .5rem; }
+.target-row { display: flex; gap: .6rem; align-items: center; }
 .target-row .idx {
   width: 2rem; height: 2rem; flex: none; border-radius: 50%; background: #ffe27a;
-  display: grid; place-items: center; font-weight: 800; margin-top: .1rem;
+  display: grid; place-items: center; font-weight: 800;
 }
+.target-row .preview { flex: 1; }
 input[type=text], input[type=email], input[type=password], textarea, select {
   font-family: inherit; font-size: 1rem; padding: .6rem .8rem; width: 100%;
   border: 2px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink);
@@ -137,33 +138,6 @@ input[type=text]:focus, input[type=email]:focus, input[type=password]:focus, tex
   background: var(--blue-soft); border-radius: 12px; padding: .55rem .8rem;
   min-height: 2.6rem; font-size: 1.15rem;
 }
-.chips { display: flex; gap: .35rem; flex-wrap: wrap; margin-top: .4rem; }
-.chip {
-  background: #f3f5fa; border: 1px solid var(--line); border-radius: 999px;
-  padding: .15rem .6rem; font-size: .78rem; cursor: pointer; font-family: inherit;
-}
-.chip:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
-
-.target-builder { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; flex: 1; }
-.slot-text {
-  width: auto; min-width: 2.2rem; border: 2px solid var(--line); border-radius: 10px;
-  padding: .5rem .6rem; font-family: inherit; font-size: 1rem; background: #fff; color: var(--ink);
-}
-.slot-text:focus { outline: none; border-color: var(--blue); }
-.slot-pill {
-  display: inline-flex; align-items: center; gap: .1rem; background: #fff7dd;
-  border: 2px solid #f0c94a; border-radius: 10px; padding-left: .5rem;
-}
-.slot-select {
-  width: auto; border: none; background: transparent; font-family: inherit; font-weight: 800;
-  font-size: .95rem; color: #8a6a00; padding: .5rem .2rem;
-}
-.slot-select:focus { outline: none; }
-.slot-remove {
-  border: none; background: none; color: var(--red-dark); cursor: pointer; font-size: .8rem;
-  padding: .3rem .5rem; border-radius: 8px; font-family: inherit;
-}
-.slot-remove:hover { background: #ffe0e4; }
 
 .cat { border: 2px solid var(--line); border-radius: 14px; margin-bottom: .8rem; overflow: hidden; }
 .cat > summary {

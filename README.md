@@ -124,9 +124,15 @@ it's normal, not a bug.
 
 ---
 
-## Writing target structures
+## Target structures
 
-Type the phrase you want repeated. Slots in curly brackets are filled from your word lists:
+Each word pack ships with its own 2–3 target structures — these are fixed and shown
+read-only in Setup step 3, with a real example filled in from that pack's word lists, so a
+teacher can see exactly what the class will hear without being able to break the grammar
+by accident. Switching to a different word pack drills different structures.
+
+To change what a pack drills, or add a new pack, edit `PRESETS` in `js/data.js` directly.
+Each target is a phrase with slots in curly brackets, filled from the pack's word lists:
 
 | Slot | Comes from |
 |---|---|
