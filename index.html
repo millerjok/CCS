@@ -90,6 +90,12 @@
       </div>
     </div>
 
+    <div class="card" id="cloud-card" style="display:none">
+      <h2>☁️ Shared word packs</h2>
+      <div class="sub" id="cloud-status">Checking for shared updates…</div>
+      <div id="cloud-body"></div>
+    </div>
+
     <div class="card">
       <h2><span class="num">4</span>Repetition</h2>
       <div class="sub">How many times should each new fact be asked back before the story continues?</div>
@@ -129,12 +135,19 @@
 
 </div>
 
+<!-- Optional shared word packs (js/cloud.js) - loads only if a network is
+     reachable and CONFIG is filled in there; the app works fully without it. -->
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js" defer></script>
+
 <script src="js/furigana.js"></script>
 <script src="js/data.js"></script>
 <script src="js/jp.js"></script>
 <script src="js/art.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/story.js"></script>
-<script src="js/app.js"></script>
+<script src="js/cloud.js" defer></script>
+<script src="js/app.js" defer></script>
 </body>
 </html>

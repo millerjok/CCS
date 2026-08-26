@@ -29,6 +29,53 @@ somewhere else.
   your saved word lists and grammar are untouched, and you'll set a new PIN
   immediately after.
 
+## Shared word packs (optional)
+
+By default, edits to a word pack are saved only in the browser that made them —
+useful for trying things out, but it means one teacher's changes never reach
+another teacher's device. `js/cloud.js` adds an optional layer on top of that:
+a real shared backend (Firebase) so a published change becomes the new default
+for **every visitor to the site**, including ones who've never touched Setup.
+
+It ships turned off — nothing in the page calls out to any server until it's
+configured, and CCS works exactly as described above either way. To turn it on:
+
+1. [console.firebase.google.com](https://console.firebase.google.com) → Add project (free "Spark" plan, no card required).
+2. **Build → Firestore Database → Create database** → start in **production mode**.
+3. Firestore → **Rules**, replace the contents with:
+   ```
+   rules_version = '2';
+   service cloud.firestore {
+     match /databases/{database}/documents {
+       match /packs/{packId} {
+         allow read: if true;
+         allow write: if request.auth != null;
+       }
+     }
+   }
+   ```
+4. **Build → Authentication → Get started → Sign-in method → Email/Password → Enable.**
+5. Authentication → **Users → Add user.** This one login is shared by every teacher
+   who should be able to publish — treat it like a staffroom key, not a personal
+   password.
+6. Project settings (⚙️) → General → "Your apps" → **Add app → Web (`</>`).**
+   Copy the `firebaseConfig` object it gives you.
+7. Paste those six values into the `CONFIG` object at the top of `js/cloud.js`, commit, push.
+
+Once configured: a **☁️ Shared word packs** card appears in Setup. Every page load
+fetches whatever's been published and shows that instead of the built-in default —
+even if nobody in that session ever opens Setup. A **📤 Publish this as the
+shared "___" pack** button lets anyone who knows the shared login overwrite the
+current pack for everyone; publishing a pack that isn't one of the built-in
+five adds it as a new card for all visitors.
+
+**Why this one actually is secure, unlike the PIN above:** the shared login is
+checked by Firebase itself over HTTPS, and Firestore's rules — which live in the
+Firebase console, never in this repo — are what decide whether a write is
+allowed. There's no secret sitting in the JavaScript for someone to read. The
+one thing to still get right: don't reuse a password that matters elsewhere for
+that shared login, since it's meant to be told to colleagues.
+
 ## How a lesson runs
 
 **1. Before the lesson — put your language in.**

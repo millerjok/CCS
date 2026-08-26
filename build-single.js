@@ -22,7 +22,12 @@ html = html.replace(/<link rel="stylesheet" href="([^"]+)">/g, function (_, href
   return '<style>\n' + fs.readFileSync(path.join(dir, href), 'utf8') + '\n</style>';
 });
 
-html = html.replace(/<script src="([^"]+)"><\/script>/g, function (_, src) {
+/* Inlines every local js/*.js file (defer or not - the attribute is dropped,
+ * since an inlined script always runs synchronously anyway). External CDN
+ * scripts (the optional Firebase SDK for shared word packs) are left exactly
+ * as they are - they can't be bundled, and still work fine standalone. */
+html = html.replace(/<script src="([^"]+)"[^>]*><\/script>/g, function (whole, src) {
+  if (/^https?:\/\//.test(src)) return whole;
   return '<script>\n' + fs.readFileSync(path.join(dir, src), 'utf8') + '\n</script>';
 });
 

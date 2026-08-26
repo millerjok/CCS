@@ -5,7 +5,7 @@
 (function (ns) {
   'use strict';
 
-  var R = ns.ruby, D = ns.data, JP = ns.jp, art = ns.art, audio = ns.audio;
+  var R = ns.ruby, D = ns.data, JP = ns.jp, art = ns.art, audio = ns.audio, cloud = ns.cloud;
   var STORE = 'ccs.config.v2';
 
   var config = null;
@@ -223,7 +223,9 @@
     box.innerHTML = '';
     D.PRESETS.forEach(function (p) {
       var b = el('button', 'preset' + (ui.preset === p.id ? ' selected' : ''),
-        '<div class="pi">' + p.icon + '</div><div class="pn">' + R.escapeHtml(p.name) + '</div>' +
+        '<div class="pi' + (p.shared ? ' shared' : '') + '">' + p.icon +
+        (p.shared ? '<span class="preset-badge">☁️</span>' : '') + '</div>' +
+        '<div class="pn">' + R.escapeHtml(p.name) + '</div>' +
         '<div class="pe">' + R.escapeHtml(p.en) + '</div>');
       b.type = 'button';
       b.onclick = function () {
@@ -247,6 +249,7 @@
 
     renderVocab();
     $('#circling').value = ui.level;
+    if (cloud && cloud.enabled()) renderCloudPublish();
   }
 
   function targetRow(i) {
@@ -367,6 +370,91 @@
     del.onclick = function () { list.splice(idx, 1); saveConfig(); renderVocab(); };
     row.appendChild(del);
     return row;
+  }
+
+  /* ---------------- shared word packs ----------------
+   * Fetches whatever teachers have already published and folds it over the
+   * built-in defaults, so every visitor sees the latest shared version -
+   * not just the browser that made the edit. Silently does nothing if
+   * cloud.js has no project configured, or the network is unreachable. */
+  function syncCloud() {
+    if (!cloud || !cloud.enabled()) return;
+    $('#cloud-card').style.display = '';
+    cloud.fetchShared().then(function (result) {
+      var shared = result.packs;
+      shared.forEach(function (item) {
+        var existing = D.PRESETS.filter(function (p) { return p.id === item.id; })[0];
+        if (existing) {
+          existing.config = item.config;
+          existing.shared = true;
+        } else {
+          D.PRESETS.push({
+            id: item.id, name: item.config.title || item.id, en: 'Shared pack',
+            icon: '☁️', shared: true, config: item.config
+          });
+        }
+      });
+      if (!result.ok) {
+        $('#cloud-status').textContent = '☁️ Could not reach the shared word packs right now - showing the last version saved on this device.';
+      } else if (shared.length) {
+        $('#cloud-status').textContent = '☁️ Showing the latest shared word packs (' + shared.length + ' published).';
+      } else {
+        $('#cloud-status').textContent = '☁️ Connected. No packs have been published yet - the built-in defaults are shown.';
+      }
+      renderSetup();
+      renderCloudPublish();
+    });
+  }
+
+  function renderCloudPublish() {
+    var body = $('#cloud-body');
+    if (!body) return;
+    body.innerHTML = '';
+
+    var targetId = ui.preset || 'default';
+    var targetPreset = D.PRESETS.filter(function (p) { return p.id === targetId; })[0];
+    var targetName = targetPreset ? targetPreset.name : targetId;
+
+    var openBtn = button('📤 Publish this as the shared "' + targetName + '" pack', 'ghost', function () {
+      form.style.display = form.style.display === 'none' ? '' : 'none';
+    });
+    body.appendChild(openBtn);
+
+    var form = el('div', 'cloud-form');
+    form.style.display = 'none';
+    form.appendChild(el('div', 'meter',
+      'This replaces the shared "' + targetName + '" pack for every visitor to the site. Sign in with the shared teacher login to confirm.'));
+    var nameInput = el('input'); nameInput.type = 'text'; nameInput.placeholder = 'Your name (optional, shown to other teachers)';
+    var emailInput = el('input'); emailInput.type = 'email'; emailInput.placeholder = 'Teacher login email'; emailInput.autocomplete = 'username';
+    var passInput = el('input'); passInput.type = 'password'; passInput.placeholder = 'Teacher login password'; passInput.autocomplete = 'current-password';
+    [nameInput, emailInput, passInput].forEach(function (i) { form.appendChild(i); });
+
+    var msg = el('div');
+    form.appendChild(msg);
+
+    var row = el('div', 'row');
+    var goBtn = button('📤 Publish', 'red', function () {
+      msg.innerHTML = '';
+      if (!emailInput.value || !passInput.value) {
+        msg.innerHTML = '<div class="cloud-msg bad">Enter the teacher login email and password.</div>';
+        return;
+      }
+      goBtn.disabled = true;
+      goBtn.textContent = 'Publishing…';
+      cloud.publish(targetId, config, nameInput.value, emailInput.value, passInput.value).then(function () {
+        msg.innerHTML = '<div class="cloud-msg ok">✅ Published. Everyone who opens this site will now see this version of "' + targetName + '".</div>';
+        passInput.value = '';
+        if (targetPreset) targetPreset.config = cloneConfig(config);
+      }).catch(function (errMsg) {
+        msg.innerHTML = '<div class="cloud-msg bad">' + R.escapeHtml(String(errMsg)) + '</div>';
+      }).then(function () {
+        goBtn.disabled = false;
+        goBtn.textContent = '📤 Publish';
+      });
+    });
+    row.appendChild(goBtn);
+    form.appendChild(row);
+    body.appendChild(form);
   }
 
   /* ---------------- play screen ---------------- */
@@ -778,6 +866,13 @@
     wire();
     renderSetup();
     applyUi();
+    /* Wait for the window's load event (not just DOMContentLoaded) before
+     * touching the optional Firebase SDK - it's an external, deferred script,
+     * and whether it has finished executing yet depends on script order and
+     * network timing that differs between index.html and the bundled
+     * ccs-standalone.html. `load` fires only once everything genuinely has. */
+    if (document.readyState === 'complete') syncCloud();
+    else window.addEventListener('load', syncCloud);
     if (isUnlocked()) {
       show('setup');
     } else {

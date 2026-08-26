@@ -126,11 +126,13 @@ body.furi-off ruby rt { opacity: 0; }
   width: 2rem; height: 2rem; flex: none; border-radius: 50%; background: #ffe27a;
   display: grid; place-items: center; font-weight: 800;
 }
-input[type=text], textarea, select {
+input[type=text], input[type=email], input[type=password], textarea, select {
   font-family: inherit; font-size: 1rem; padding: .6rem .8rem; width: 100%;
   border: 2px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink);
 }
-input[type=text]:focus, textarea:focus { outline: none; border-color: var(--blue); }
+input[type=text]:focus, input[type=email]:focus, input[type=password]:focus, textarea:focus {
+  outline: none; border-color: var(--blue);
+}
 .preview {
   background: var(--blue-soft); border-radius: 12px; padding: .55rem .8rem;
   min-height: 2.6rem; font-size: 1.15rem;
@@ -297,6 +299,17 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
 .lock-note { color: var(--ink-soft); font-size: .78rem; margin-top: 1rem; line-height: 1.5; }
 .lock-link { background: none; border: none; color: var(--blue); font-family: inherit;
   font-size: .82rem; cursor: pointer; text-decoration: underline; padding: .3rem; }
+
+/* ---------- shared word packs ---------- */
+.cloud-msg { border-radius: 10px; padding: .6rem .8rem; font-size: .85rem; font-weight: 700; margin-top: .6rem; }
+.cloud-msg.ok { background: #eefaf3; border: 2px solid var(--green); color: #1c7a4d; }
+.cloud-msg.bad { background: #fff1f3; border: 2px solid var(--red); color: var(--red-dark); }
+.cloud-form { display: grid; gap: .5rem; max-width: 360px; margin-top: .6rem; }
+.preset .pi.shared { position: relative; }
+.preset-badge {
+  position: absolute; top: -8px; right: -8px; background: var(--blue); color: #fff;
+  border-radius: 999px; font-size: .68rem; font-weight: 800; padding: .1rem .4rem;
+}
 
 @media print {
   body { background: #fff; }

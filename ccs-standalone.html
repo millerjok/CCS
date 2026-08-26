@@ -138,11 +138,13 @@ body.furi-off ruby rt { opacity: 0; }
   width: 2rem; height: 2rem; flex: none; border-radius: 50%; background: #ffe27a;
   display: grid; place-items: center; font-weight: 800;
 }
-input[type=text], textarea, select {
+input[type=text], input[type=email], input[type=password], textarea, select {
   font-family: inherit; font-size: 1rem; padding: .6rem .8rem; width: 100%;
   border: 2px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink);
 }
-input[type=text]:focus, textarea:focus { outline: none; border-color: var(--blue); }
+input[type=text]:focus, input[type=email]:focus, input[type=password]:focus, textarea:focus {
+  outline: none; border-color: var(--blue);
+}
 .preview {
   background: var(--blue-soft); border-radius: 12px; padding: .55rem .8rem;
   min-height: 2.6rem; font-size: 1.15rem;
@@ -310,6 +312,17 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
 .lock-link { background: none; border: none; color: var(--blue); font-family: inherit;
   font-size: .82rem; cursor: pointer; text-decoration: underline; padding: .3rem; }
 
+/* ---------- shared word packs ---------- */
+.cloud-msg { border-radius: 10px; padding: .6rem .8rem; font-size: .85rem; font-weight: 700; margin-top: .6rem; }
+.cloud-msg.ok { background: #eefaf3; border: 2px solid var(--green); color: #1c7a4d; }
+.cloud-msg.bad { background: #fff1f3; border: 2px solid var(--red); color: var(--red-dark); }
+.cloud-form { display: grid; gap: .5rem; max-width: 360px; margin-top: .6rem; }
+.preset .pi.shared { position: relative; }
+.preset-badge {
+  position: absolute; top: -8px; right: -8px; background: var(--blue); color: #fff;
+  border-radius: 999px; font-size: .68rem; font-weight: 800; padding: .1rem .4rem;
+}
+
 @media print {
   body { background: #fff; }
   .topbar, .toolbar, .btn, .stage-wrap, .no-print { display: none !important; }
@@ -405,6 +418,12 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       </div>
     </div>
 
+    <div class="card" id="cloud-card" style="display:none">
+      <h2>☁️ Shared word packs</h2>
+      <div class="sub" id="cloud-status">Checking for shared updates…</div>
+      <div id="cloud-body"></div>
+    </div>
+
     <div class="card">
       <h2><span class="num">4</span>Repetition</h2>
       <div class="sub">How many times should each new fact be asked back before the story continues?</div>
@@ -443,6 +462,12 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
   </section>
 
 </div>
+
+<!-- Optional shared word packs (js/cloud.js) - loads only if a network is
+     reachable and CONFIG is filled in there; the app works fully without it. -->
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js" defer></script>
 
 <script>
 /* CCS — furigana engine
@@ -2233,6 +2258,119 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
 
 </script>
 <script>
+/* CCS — shared word packs
+ * Optional. When configured, a teacher's edits can be published so every
+ * visitor to the site sees them as the new default - not just the browser
+ * that made the change. Nothing here runs, or errors, until CONFIG below is
+ * filled in: with no cloud project set up, CCS behaves exactly as it did
+ * before (each browser keeps its own local edits, per config.js).
+ *
+ * How it's secured: Firestore's rules (set server-side, in the Firebase
+ * console - never shipped in this file) make packs/* world-readable but
+ * writable only by a signed-in user. Signing in calls Firebase's own
+ * authentication, which this code never sees the password for beyond
+ * relaying it over HTTPS - there is no password check happening in this
+ * file to read out of the page source, unlike the local "Teacher" PIN.
+ *
+ * Setup (one-time, for whoever administers the shared word packs):
+ *   1. https://console.firebase.google.com -> Add project (free "Spark" plan).
+ *   2. Build -> Firestore Database -> Create database -> production mode.
+ *   3. Firestore -> Rules, paste:
+ *        rules_version = '2';
+ *        service cloud.firestore {
+ *          match /databases/{database}/documents {
+ *            match /packs/{packId} {
+ *              allow read: if true;
+ *              allow write: if request.auth != null;
+ *            }
+ *          }
+ *        }
+ *   4. Build -> Authentication -> Get started -> Sign-in method -> Email/Password -> Enable.
+ *   5. Authentication -> Users -> Add user. This one login is shared by every
+ *      teacher who should be able to publish - treat it like a staffroom key,
+ *      not a personal password.
+ *   6. Project settings (gear icon) -> General -> "Your apps" -> Add app -> Web (</>).
+ *      Copy the firebaseConfig object it gives you into CONFIG below.
+ */
+(function (ns) {
+  'use strict';
+
+  /* Fill these in from step 6 above. Leave apiKey empty to keep CCS fully
+   * local (no network calls, no console errors) - that's the default. */
+  var CONFIG = {
+    apiKey: '',
+    authDomain: '',
+    projectId: '',
+    storageBucket: '',
+    messagingSenderId: '',
+    appId: ''
+  };
+
+  var ready = false;
+  var db = null;
+
+  function enabled() { return !!CONFIG.apiKey; }
+
+  function ensureInit() {
+    if (ready || !enabled()) return ready;
+    try {
+      if (typeof firebase === 'undefined') return false;
+      firebase.initializeApp(CONFIG);
+      db = firebase.firestore();
+      ready = true;
+    } catch (e) { ready = false; }
+    return ready;
+  }
+
+  /* fetchShared() -> Promise<{ok, packs}>
+   * Never rejects, so callers never need a special offline path - but "ok"
+   * tells the difference between "connected, nothing published" and
+   * "couldn't reach the server" so the status line doesn't overclaim on
+   * flaky classroom wifi. */
+  function fetchShared() {
+    if (!ensureInit()) return Promise.resolve({ ok: false, packs: [] });
+    return db.collection('packs').get().then(function (snap) {
+      var out = [];
+      snap.forEach(function (doc) {
+        var data = doc.data();
+        if (data && data.config) out.push({ id: doc.id, config: data.config, meta: data });
+      });
+      return { ok: true, packs: out };
+    }).catch(function () { return { ok: false, packs: [] }; });
+  }
+
+  /* publish(id, config, name, email, password) -> Promise (resolves or rejects with a short message) */
+  function publish(id, config, name, email, password) {
+    if (!ensureInit()) {
+      return Promise.reject('Cloud publishing isn’t set up on this site yet.');
+    }
+    return firebase.auth().signInWithEmailAndPassword(email, password).then(function () {
+      return db.collection('packs').doc(id).set({
+        config: config,
+        publishedBy: (name || '').slice(0, 60),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }).then(function () {
+      return firebase.auth().signOut().catch(function () {});
+    }).catch(function (err) {
+      var code = err && err.code || '';
+      if (/user-not-found|wrong-password|invalid-credential|invalid-login-credentials/.test(code)) {
+        throw 'That login was not correct.';
+      }
+      if (/network/.test(code)) throw 'Could not reach the server. Check your internet connection.';
+      throw 'Could not publish (' + (code || 'unknown error') + ').';
+    });
+  }
+
+  ns.cloud = {
+    enabled: enabled,
+    fetchShared: fetchShared,
+    publish: publish
+  };
+})(window.CCS = window.CCS || {});
+
+</script>
+<script>
 /* CCS — app shell
  * Screens: setup (teacher puts the language in) -> play (class builds the story)
  * -> recap (the class reads back what they made).
@@ -2240,7 +2378,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
 (function (ns) {
   'use strict';
 
-  var R = ns.ruby, D = ns.data, JP = ns.jp, art = ns.art, audio = ns.audio;
+  var R = ns.ruby, D = ns.data, JP = ns.jp, art = ns.art, audio = ns.audio, cloud = ns.cloud;
   var STORE = 'ccs.config.v2';
 
   var config = null;
@@ -2458,7 +2596,9 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     box.innerHTML = '';
     D.PRESETS.forEach(function (p) {
       var b = el('button', 'preset' + (ui.preset === p.id ? ' selected' : ''),
-        '<div class="pi">' + p.icon + '</div><div class="pn">' + R.escapeHtml(p.name) + '</div>' +
+        '<div class="pi' + (p.shared ? ' shared' : '') + '">' + p.icon +
+        (p.shared ? '<span class="preset-badge">☁️</span>' : '') + '</div>' +
+        '<div class="pn">' + R.escapeHtml(p.name) + '</div>' +
         '<div class="pe">' + R.escapeHtml(p.en) + '</div>');
       b.type = 'button';
       b.onclick = function () {
@@ -2482,6 +2622,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
 
     renderVocab();
     $('#circling').value = ui.level;
+    if (cloud && cloud.enabled()) renderCloudPublish();
   }
 
   function targetRow(i) {
@@ -2602,6 +2743,91 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     del.onclick = function () { list.splice(idx, 1); saveConfig(); renderVocab(); };
     row.appendChild(del);
     return row;
+  }
+
+  /* ---------------- shared word packs ----------------
+   * Fetches whatever teachers have already published and folds it over the
+   * built-in defaults, so every visitor sees the latest shared version -
+   * not just the browser that made the edit. Silently does nothing if
+   * cloud.js has no project configured, or the network is unreachable. */
+  function syncCloud() {
+    if (!cloud || !cloud.enabled()) return;
+    $('#cloud-card').style.display = '';
+    cloud.fetchShared().then(function (result) {
+      var shared = result.packs;
+      shared.forEach(function (item) {
+        var existing = D.PRESETS.filter(function (p) { return p.id === item.id; })[0];
+        if (existing) {
+          existing.config = item.config;
+          existing.shared = true;
+        } else {
+          D.PRESETS.push({
+            id: item.id, name: item.config.title || item.id, en: 'Shared pack',
+            icon: '☁️', shared: true, config: item.config
+          });
+        }
+      });
+      if (!result.ok) {
+        $('#cloud-status').textContent = '☁️ Could not reach the shared word packs right now - showing the last version saved on this device.';
+      } else if (shared.length) {
+        $('#cloud-status').textContent = '☁️ Showing the latest shared word packs (' + shared.length + ' published).';
+      } else {
+        $('#cloud-status').textContent = '☁️ Connected. No packs have been published yet - the built-in defaults are shown.';
+      }
+      renderSetup();
+      renderCloudPublish();
+    });
+  }
+
+  function renderCloudPublish() {
+    var body = $('#cloud-body');
+    if (!body) return;
+    body.innerHTML = '';
+
+    var targetId = ui.preset || 'default';
+    var targetPreset = D.PRESETS.filter(function (p) { return p.id === targetId; })[0];
+    var targetName = targetPreset ? targetPreset.name : targetId;
+
+    var openBtn = button('📤 Publish this as the shared "' + targetName + '" pack', 'ghost', function () {
+      form.style.display = form.style.display === 'none' ? '' : 'none';
+    });
+    body.appendChild(openBtn);
+
+    var form = el('div', 'cloud-form');
+    form.style.display = 'none';
+    form.appendChild(el('div', 'meter',
+      'This replaces the shared "' + targetName + '" pack for every visitor to the site. Sign in with the shared teacher login to confirm.'));
+    var nameInput = el('input'); nameInput.type = 'text'; nameInput.placeholder = 'Your name (optional, shown to other teachers)';
+    var emailInput = el('input'); emailInput.type = 'email'; emailInput.placeholder = 'Teacher login email'; emailInput.autocomplete = 'username';
+    var passInput = el('input'); passInput.type = 'password'; passInput.placeholder = 'Teacher login password'; passInput.autocomplete = 'current-password';
+    [nameInput, emailInput, passInput].forEach(function (i) { form.appendChild(i); });
+
+    var msg = el('div');
+    form.appendChild(msg);
+
+    var row = el('div', 'row');
+    var goBtn = button('📤 Publish', 'red', function () {
+      msg.innerHTML = '';
+      if (!emailInput.value || !passInput.value) {
+        msg.innerHTML = '<div class="cloud-msg bad">Enter the teacher login email and password.</div>';
+        return;
+      }
+      goBtn.disabled = true;
+      goBtn.textContent = 'Publishing…';
+      cloud.publish(targetId, config, nameInput.value, emailInput.value, passInput.value).then(function () {
+        msg.innerHTML = '<div class="cloud-msg ok">✅ Published. Everyone who opens this site will now see this version of "' + targetName + '".</div>';
+        passInput.value = '';
+        if (targetPreset) targetPreset.config = cloneConfig(config);
+      }).catch(function (errMsg) {
+        msg.innerHTML = '<div class="cloud-msg bad">' + R.escapeHtml(String(errMsg)) + '</div>';
+      }).then(function () {
+        goBtn.disabled = false;
+        goBtn.textContent = '📤 Publish';
+      });
+    });
+    row.appendChild(goBtn);
+    form.appendChild(row);
+    body.appendChild(form);
   }
 
   /* ---------------- play screen ---------------- */
@@ -3013,6 +3239,13 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     wire();
     renderSetup();
     applyUi();
+    /* Wait for the window's load event (not just DOMContentLoaded) before
+     * touching the optional Firebase SDK - it's an external, deferred script,
+     * and whether it has finished executing yet depends on script order and
+     * network timing that differs between index.html and the bundled
+     * ccs-standalone.html. `load` fires only once everything genuinely has. */
+    if (document.readyState === 'complete') syncCloud();
+    else window.addEventListener('load', syncCloud);
     if (isUnlocked()) {
       show('setup');
     } else {
