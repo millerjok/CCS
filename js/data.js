@@ -171,6 +171,32 @@
                      v('うれしい', 'うれしい', 'happy', '😄'), v('ひま', 'ひま', 'free / not busy', '🛋️')]
         }
       }
+    },
+    {
+      id: 'farmstay',
+      name: 'ファームステイ',
+      en: 'Farm Stay Experience',
+      icon: '🚜',
+      config: {
+        title: 'ファームステイの けいけん',
+        targets: ['{もの}を 作[つく]ります', '{ばしょ}で {どうし}', 'しごとは {きもち}です'],
+        vocab: {
+          people: [v('学生', 'がくせい', 'student', '🧑‍🎓'), v('ボランティア', 'ボランティア', 'volunteer', '🙋'),
+                   v('農家の人', 'のうかの ひと', 'farmer', '👨‍🌾'), v('青山さん', 'あおやまさん', 'host (Aoyama-san)', '🧑‍🌾'),
+                   v('友だち', 'ともだち', 'friend', '🧑‍🤝‍🧑'), v('先生', 'せんせい', 'teacher', '👩‍🏫')],
+          places: [v('いなか', 'いなか', 'countryside', '🌾'), v('のうじょう', 'のうじょう', 'farm', '🚜'),
+                   v('和歌山', 'わかやま', 'Wakayama', '🗾'), v('山', 'やま', 'mountain', '⛰️'),
+                   v('川', 'かわ', 'river', '🏞️'), v('うち', 'うち', "the host's house", '🏠')],
+          things: [v('やさい', 'やさい', 'vegetables', '🥦'), v('日本料理', 'にほんりょうり', 'Japanese food', '🍱'),
+                   v('ピザ', 'ピザ', 'pizza', '🍕'), v('ビーフパイ', 'ビーフパイ', 'beef pie', '🥧'),
+                   v('しごと', 'しごと', 'work', '💼'), v('けいけん', 'けいけん', 'an experience', '✨')],
+          actions: [v('住みます', 'すみます', 'lives', '🏠'), v('学びます', 'まなびます', 'learns', '📚'),
+                    v('作ります', 'つくります', 'makes / grows', '🌱'), v('はたらきます', 'はたらきます', 'works', '💪'),
+                    v('てつだいます', 'てつだいます', 'helps', '🤝')],
+          feelings: [v('たいへん', 'たいへん', 'tough / hard', '😓'), v('いたい', 'いたい', 'painful', '🤕'),
+                     v('すばらしい', 'すばらしい', 'wonderful', '🌟'), v('うれしい', 'うれしい', 'happy', '😄')]
+        }
+      }
     }
   ];
 
@@ -280,6 +306,40 @@
 
   var CAT_FALLBACK = { people: '🧑', places: '📍', things: '📦', actions: '✨', feelings: '💭' };
 
+  /* Maps a picked feeling to one of the actor's five faces (see art.js face()),
+   * so the character on stage always matches the word the class just chose
+   * instead of whatever mood the previous story beat left behind. */
+  var MOOD_WORDS = {
+    'うれしい': 'happy', 'たのしい': 'happy', 'げんき': 'happy', 'おいしい': 'happy',
+    'やさしい': 'happy', 'しあわせ': 'happy', 'らく': 'happy', 'すばらしい': 'happy',
+    'かなしい': 'sad', 'つまらない': 'sad', 'さびしい': 'sad', 'いたい': 'sad',
+    'こわい': 'surprised', 'たいへん': 'surprised', 'びっくり': 'surprised',
+    'むずかしい': 'surprised', 'あぶない': 'surprised',
+    'わくわく': 'excited', 'おおきい': 'excited',
+    'ひま': 'neutral', 'ふつう': 'neutral', 'ふるい': 'neutral', 'ちいさい': 'neutral'
+  };
+  var MOOD_EN = {
+    happy: 'happy', glad: 'happy', fun: 'happy', delicious: 'happy', easy: 'happy',
+    energetic: 'happy', good: 'happy', wonderful: 'happy',
+    sad: 'sad', bored: 'sad', boring: 'sad', lonely: 'sad', tired: 'sad',
+    scary: 'surprised', scared: 'surprised', afraid: 'surprised', trouble: 'surprised',
+    difficult: 'surprised', hard: 'surprised', worried: 'surprised', surprised: 'surprised',
+    excited: 'excited', big: 'excited'
+  };
+
+  function moodFor(item) {
+    var r = (item && item.r || '').trim();
+    var w = (item && item.w || '').trim();
+    if (MOOD_WORDS[r]) return MOOD_WORDS[r];
+    if (MOOD_WORDS[w]) return MOOD_WORDS[w];
+    var e = (item && item.e || '').toLowerCase();
+    var key;
+    for (key in MOOD_EN) {
+      if (e === key || e.indexOf(key) !== -1) return MOOD_EN[key];
+    }
+    return 'neutral';
+  }
+
   function guessIcon(item, cat) {
     if (item && item.icon) return item.icon;
     var r = (item && item.r || '').trim();
@@ -303,6 +363,7 @@
     OBSTACLES: OBSTACLES,
     ENDINGS: ENDINGS,
     sceneKindFor: sceneKindFor,
-    guessIcon: guessIcon
+    guessIcon: guessIcon,
+    moodFor: moodFor
   };
 })(window.CCS = window.CCS || {});

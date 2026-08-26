@@ -14,7 +14,7 @@ const CCS = global.window.CCS;
 const R = CCS.ruby;
 
 const RUNS = parseInt(process.argv[2], 10) || 40;
-const LEVELS = ['light', 'normal', 'heavy'];
+const LEVELS = ['minimal', 'light', 'normal', 'heavy'];
 let failures = 0, stories = 0, totalLines = 0, totalQuestions = 0, minReps = Infinity;
 
 function check(where, text) {

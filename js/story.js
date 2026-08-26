@@ -106,7 +106,7 @@
       frame: frame, subject: subject, subjectEn: subjectEn,
       item: item, pool: poolOverride || this.pool(cat), level: this.level
     });
-    var spiral = this.spiral();
+    var spiral = this.level === 'minimal' ? null : this.spiral();
     if (spiral) qs = qs.concat(spiral);
     return this.drill(qs, label);
   };
@@ -332,6 +332,7 @@
       }),
       onPick: function (opt) {
         self.st.feeling = opt.item;
+        self.st.mood = D.moodFor(opt.item);
         self.say(J(self.nameTk(), 'は とても ', tk(opt.item), 'です。'),
           self.nameEn() + ' feels very ' + (opt.item.e || opt.item.w) + '.',
           { who: 'hero', mood: self.st.mood, icon: opt.icon });

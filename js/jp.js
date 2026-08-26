@@ -140,6 +140,7 @@
    * The class hears the same structure 5-15 times without it feeling like drill.
    */
   var LEVELS = {
+    minimal: ['yn+'],
     light:  ['yn+', 'either'],
     normal: ['yn+', 'yn-', 'either', 'wh'],
     heavy:  ['yn+', 'yn-', 'either', 'wh', 'yn-', 'wh']
@@ -297,7 +298,7 @@
     });
 
     wrong = pick((pool || []).filter(function (x) { return x.w !== item.w; }));
-    if (wrong && level !== 'light') {
+    if (wrong && level !== 'light' && level !== 'minimal') {
       out.push({
         type: 'either',
         prompt: J(target.build(item), 'か、', target.build(wrong), 'か。'),

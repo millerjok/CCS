@@ -10,7 +10,7 @@
 
   var config = null;
   var story = null;
-  var ui = { script: 'furi', english: true, level: 'normal', big: false, autoSpeak: true, preset: null };
+  var ui = { script: 'furi', english: true, level: 'minimal', big: false, autoSpeak: true, preset: null };
   var lastScene = null;
 
   function $(sel, root) { return (root || document).querySelector(sel); }
