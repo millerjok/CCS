@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCS — Co-Created Stories（日本語）</title>
+<meta name="description" content="Build a Japanese story together with your class. Choose the vocabulary, then the class decides who, where and what happens — with furigana on every line.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%B4%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/ccs.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">🎴</span>
+      <div>
+        <h1>CCS — Co-Created Stories</h1>
+        <small>みんなで つくる にほんごの ものがたり</small>
+      </div>
+    </div>
+    <nav class="toolbar">
+      <button class="tgl on" id="t-script" type="button">ふりがな ON</button>
+      <button class="tgl on" id="t-en" type="button">English</button>
+      <button class="tgl on" id="t-voice" type="button">🗣 こえ</button>
+      <button class="tgl on" id="t-sound" type="button">🔔 おと</button>
+      <button class="tgl" id="t-big" type="button">🔍 大きく</button>
+    </nav>
+  </header>
+
+  <!-- ============ SETUP ============ -->
+  <section class="screen active" id="setup">
+
+    <div class="card">
+      <h2>🎌 What this is</h2>
+      <div class="sub">
+        A co-created story: you choose the language, the class chooses the story.
+        Everything appears in Japanese with furigana, and every fact the class decides on
+        gets asked back to them several times (<em>circling</em>) before the story moves on.
+      </div>
+      <div class="meters">
+        <div class="meter">① だれ？ a character who <b>wants</b> something</div>
+        <div class="meter">② だめ！ tries and <b>fails</b></div>
+        <div class="meter">③ また だめ！ <b>fails again</b></div>
+        <div class="meter">④ おわり with <b>help</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">1</span>ことばセット を えらぶ</h2>
+      <div class="sub">Start from a ready-made pack, then edit anything below. Your changes are saved in this browser.</div>
+      <div class="presets" id="presets"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">2</span>ターゲット・ぶんぽう</h2>
+      <div class="sub">
+        The 2–3 structures you want the class to hear again and again. Put a slot in curly brackets —
+        <code>{もの}</code>, <code>{ばしょ}</code>, <code>{ひと}</code>, <code>{どうし}</code>, <code>{きもち}</code> —
+        and the story fills it in. Write furigana as <code>学校[がっこう]</code>.
+      </div>
+      <div class="targets" id="targets"></div>
+      <div class="row" style="margin-top:1rem">
+        <label class="meter" for="title">タイトル</label>
+        <input type="text" id="title" style="max-width:340px" placeholder="ラーメンが ほしい！">
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">3</span>ことば（vocabulary）</h2>
+      <div class="sub">
+        These are the choices the class picks from. Three or more words per list is plenty —
+        fewer words means more repetition, which is exactly what you want with Years 7–9.
+      </div>
+      <div id="vocab"></div>
+      <div class="row" style="margin-top:.8rem">
+        <button class="btn ghost" id="share" type="button">🔗 リンクを コピー (share this pack)</button>
+        <button class="btn ghost" id="reset" type="button">↺ もとに もどす</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">4</span>くりかえし（repetition）</h2>
+      <div class="sub">How many times should each new fact be asked back before the story continues?</div>
+      <div class="row">
+        <select id="circling" style="max-width:340px">
+          <option value="light">かるく — 2 questions (fast, older classes)</option>
+          <option value="normal" selected>ふつう — 4 questions (recommended)</option>
+          <option value="heavy">たっぷり — 6 questions (Year 7, or new structures)</option>
+        </select>
+        <div class="spacer"></div>
+        <button class="btn big red" id="start" type="button">▶ スタート！</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PLAY ============ -->
+  <section class="screen" id="play">
+    <div class="row" style="margin-bottom:.6rem">
+      <button class="btn ghost no-print" id="back-setup" type="button">← ことば</button>
+      <div class="spacer"></div>
+      <div class="meters" id="meters"></div>
+    </div>
+    <div class="stage-wrap">
+      <div class="stage" id="stage"></div>
+    </div>
+    <div id="play-body"></div>
+    <p class="meter no-print" style="margin-top:1rem">
+      キーボード: <b>スペース</b> = つぎへ　<b>1〜4</b> = こたえ
+    </p>
+  </section>
+
+  <!-- ============ RECAP ============ -->
+  <section class="screen" id="recap">
+    <div id="recap-body"></div>
+  </section>
+
+</div>
+
+<script src="js/furigana.js"></script>
+<script src="js/data.js"></script>
+<script src="js/jp.js"></script>
+<script src="js/art.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/story.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
