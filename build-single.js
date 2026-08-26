@@ -18,8 +18,13 @@ const out = outArg || path.join(dir, 'ccs-standalone.html');
 
 let html = fs.readFileSync(path.join(dir, 'index.html'), 'utf8');
 
+/* Local hrefs/srcs carry a "?v=N" cache-buster for the real deployment (so a
+ * browser or GitHub's CDN can never serve stale JS/CSS after a push again);
+ * strip it before resolving to a file on disk. */
+function localPath(src) { return path.join(dir, src.replace(/\?.*$/, '')); }
+
 html = html.replace(/<link rel="stylesheet" href="([^"]+)">/g, function (_, href) {
-  return '<style>\n' + fs.readFileSync(path.join(dir, href), 'utf8') + '\n</style>';
+  return '<style>\n' + fs.readFileSync(localPath(href), 'utf8') + '\n</style>';
 });
 
 /* Inlines every local js/*.js file (defer or not - the attribute is dropped,
@@ -28,7 +33,7 @@ html = html.replace(/<link rel="stylesheet" href="([^"]+)">/g, function (_, href
  * as they are - they can't be bundled, and still work fine standalone. */
 html = html.replace(/<script src="([^"]+)"[^>]*><\/script>/g, function (whole, src) {
   if (/^https?:\/\//.test(src)) return whole;
-  return '<script>\n' + fs.readFileSync(path.join(dir, src), 'utf8') + '\n</script>';
+  return '<script>\n' + fs.readFileSync(localPath(src), 'utf8') + '\n</script>';
 });
 
 if (bodyOnly) {
