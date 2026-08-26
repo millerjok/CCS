@@ -50,13 +50,13 @@
     </div>
 
     <div class="card">
-      <h2><span class="num">1</span>ことばセット を えらぶ</h2>
+      <h2><span class="num">1</span>Choose a word pack</h2>
       <div class="sub">Start from a ready-made pack, then edit anything below. Your changes are saved in this browser.</div>
       <div class="presets" id="presets"></div>
     </div>
 
     <div class="card">
-      <h2><span class="num">2</span>ターゲット・ぶんぽう</h2>
+      <h2><span class="num">2</span>Target grammar</h2>
       <div class="sub">
         The 2–3 structures you want the class to hear again and again. Put a slot in curly brackets —
         <code>{もの}</code>, <code>{ばしょ}</code>, <code>{ひと}</code>, <code>{どうし}</code>, <code>{きもち}</code> —
@@ -64,35 +64,35 @@
       </div>
       <div class="targets" id="targets"></div>
       <div class="row" style="margin-top:1rem">
-        <label class="meter" for="title">タイトル</label>
+        <label class="meter" for="title">Title</label>
         <input type="text" id="title" style="max-width:340px" placeholder="ラーメンが ほしい！">
       </div>
     </div>
 
     <div class="card">
-      <h2><span class="num">3</span>ことば（vocabulary）</h2>
+      <h2><span class="num">3</span>Vocabulary</h2>
       <div class="sub">
         These are the choices the class picks from. Three or more words per list is plenty —
         fewer words means more repetition, which is exactly what you want with Years 7–9.
       </div>
       <div id="vocab"></div>
       <div class="row" style="margin-top:.8rem">
-        <button class="btn ghost" id="share" type="button">🔗 リンクを コピー (share this pack)</button>
-        <button class="btn ghost" id="reset" type="button">↺ もとに もどす</button>
+        <button class="btn ghost" id="share" type="button">🔗 Copy link (share this pack)</button>
+        <button class="btn ghost" id="reset" type="button">↺ Reset</button>
       </div>
     </div>
 
     <div class="card">
-      <h2><span class="num">4</span>くりかえし（repetition）</h2>
+      <h2><span class="num">4</span>Repetition</h2>
       <div class="sub">How many times should each new fact be asked back before the story continues?</div>
       <div class="row">
         <select id="circling" style="max-width:340px">
-          <option value="light">かるく — 2 questions (fast, older classes)</option>
-          <option value="normal" selected>ふつう — 4 questions (recommended)</option>
-          <option value="heavy">たっぷり — 6 questions (Year 7, or new structures)</option>
+          <option value="light">Light — 2 questions (fast, older classes)</option>
+          <option value="normal" selected>Normal — 4 questions (recommended)</option>
+          <option value="heavy">Full — 6 questions (Year 7, or new structures)</option>
         </select>
         <div class="spacer"></div>
-        <button class="btn big red" id="start" type="button">▶ スタート！</button>
+        <button class="btn big red" id="start" type="button">▶ Start!</button>
       </div>
     </div>
   </section>
@@ -100,7 +100,7 @@
   <!-- ============ PLAY ============ -->
   <section class="screen" id="play">
     <div class="row" style="margin-bottom:.6rem">
-      <button class="btn ghost no-print" id="back-setup" type="button">← ことば</button>
+      <button class="btn ghost no-print" id="back-setup" type="button">← Setup</button>
       <div class="spacer"></div>
       <div class="meters" id="meters"></div>
     </div>
@@ -109,7 +109,7 @@
     </div>
     <div id="play-body"></div>
     <p class="meter no-print" style="margin-top:1rem">
-      キーボード: <b>スペース</b> = つぎへ　<b>1〜4</b> = こたえ
+      Keyboard: <b>Space</b> = next&emsp;<b>1–4</b> = answer
     </p>
   </section>
 

@@ -10,7 +10,7 @@
 
   var config = null;
   var story = null;
-  var ui = { script: 'furi', english: true, level: 'normal', big: false, autoSpeak: true };
+  var ui = { script: 'furi', english: true, level: 'normal', big: false, autoSpeak: true, preset: null };
   var lastScene = null;
 
   function $(sel, root) { return (root || document).querySelector(sel); }
@@ -81,13 +81,15 @@
     var box = $('#presets');
     box.innerHTML = '';
     D.PRESETS.forEach(function (p) {
-      var b = el('button', 'preset',
+      var b = el('button', 'preset' + (ui.preset === p.id ? ' selected' : ''),
         '<div class="pi">' + p.icon + '</div><div class="pn">' + R.escapeHtml(p.name) + '</div>' +
         '<div class="pe">' + R.escapeHtml(p.en) + '</div>');
       b.type = 'button';
       b.onclick = function () {
         config = cloneConfig(p.config);
+        ui.preset = p.id;
         saveConfig();
+        applyUi();
         renderSetup();
       };
       box.appendChild(b);
@@ -466,7 +468,7 @@
     host.innerHTML = '';
 
     var head = el('div', 'card');
-    head.innerHTML = '<h2>📖 わたしたちの ものがたり</h2>' +
+    head.innerHTML = '<h2>📖 Our Story</h2>' +
       '<div class="sub">Our story — read it together, then read it again with the words hidden.</div>';
     var stats = el('div', 'meters');
     stats.innerHTML =

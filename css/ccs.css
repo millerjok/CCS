@@ -114,6 +114,8 @@ body.furi-off ruby rt { opacity: 0; }
   cursor: pointer; text-align: left; font-family: inherit; transition: .15s;
 }
 .preset:hover { border-color: var(--red); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.preset.selected { border-color: var(--red); box-shadow: 0 0 0 3px rgba(224, 54, 75, .16); }
+.preset.selected:hover { transform: translateY(-2px); }
 .preset .pi { font-size: 1.8rem; }
 .preset .pn { font-weight: 800; font-size: 1.05rem; }
 .preset .pe { color: var(--ink-soft); font-size: .8rem; }
