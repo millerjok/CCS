@@ -11,6 +11,24 @@ a school network share, or GitHub Pages.
 
 ---
 
+## Teacher login
+
+The first time CCS is opened on a device, it asks the teacher to set a PIN before
+showing the Setup screen. After that, the same browser asks for that PIN again on
+every fresh visit (closing the tab and reopening it, or a page reload after the
+🔒 button is pressed) but not on an ordinary reload mid-lesson — so you can leave
+it open for a whole lesson without re-entering it. **This is a deterrent, not real
+security**: CCS is a static page with no server, so the PIN and its check both live
+in the page's own source — anyone who reads it could see exactly how it works.
+It exists to stop a student from casually opening Setup and rewriting the word
+list mid-lesson, not to protect anything sensitive. Don't reuse a PIN from
+somewhere else.
+
+- 🔒/🔓 **Teacher** in the toolbar shows the current state and locks it on click.
+- Forgotten your PIN? The login screen has a reset link — it clears the PIN only,
+  your saved word lists and grammar are untouched, and you'll set a new PIN
+  immediately after.
+
 ## How a lesson runs
 
 **1. Before the lesson — put your language in.**

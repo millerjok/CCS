@@ -75,6 +75,147 @@
     } catch (e) { return ''; }
   }
 
+  /* ---------------- teacher lock ----------------
+   * CCS is a static page with no server, so this cannot be real authentication -
+   * anyone who reads the source can see exactly how it works. It exists to stop
+   * a student from casually opening "Setup" and rewriting the word list, not to
+   * protect anything sensitive. The PIN is created by the teacher on first use
+   * (never shipped with a default) and stored, hashed, only in this browser.
+   */
+  var PIN_KEY = 'ccs.pinhash';
+  var UNLOCK_KEY = 'ccs.unlocked';
+
+  function hasPin() {
+    try { return !!localStorage.getItem(PIN_KEY); } catch (e) { return false; }
+  }
+
+  function isUnlocked() {
+    try { return sessionStorage.getItem(UNLOCK_KEY) === '1'; } catch (e) { return true; }
+  }
+
+  function setUnlocked(v) {
+    try {
+      if (v) sessionStorage.setItem(UNLOCK_KEY, '1');
+      else sessionStorage.removeItem(UNLOCK_KEY);
+    } catch (e) {}
+  }
+
+  function digitsOnly(s) { return (s || '').replace(/\D/g, ''); }
+
+  function hashPin(pin) {
+    if (window.crypto && window.crypto.subtle && window.isSecureContext !== false) {
+      var bytes = new TextEncoder().encode('ccs-pin:' + pin);
+      return window.crypto.subtle.digest('SHA-256', bytes).then(function (buf) {
+        return Array.prototype.map.call(new Uint8Array(buf), function (b) {
+          return b.toString(16).padStart(2, '0');
+        }).join('');
+      });
+    }
+    /* Fallback for a non-secure context (e.g. plain http:// on a school LAN)
+     * where SubtleCrypto is unavailable - same caveat as above, just weaker. */
+    var h = 0, i, s = 'ccs-pin:' + pin;
+    for (i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+    return Promise.resolve('fnv1:' + h.toString(16));
+  }
+
+  /* goSetup() is how every part of the app should ask to see Setup - it
+   * re-checks the lock every time, so re-locking mid-lesson actually holds. */
+  function goSetup() {
+    if (isUnlocked()) { show('setup'); return; }
+    renderLock();
+    show('lock');
+  }
+
+  function renderLock() {
+    var body = $('#lock-body');
+    var creating = !hasPin();
+    body.innerHTML = '';
+
+    body.appendChild(el('div', 'lock-icon', creating ? '🔑' : '🔒'));
+    body.appendChild(el('h2', null, creating ? 'Set a teacher PIN' : 'Teacher login'));
+    body.appendChild(el('div', 'sub', creating
+      ? 'Choose a 4+ digit PIN. Only you (on this device) will need it to edit the word list and grammar.'
+      : 'Enter your PIN to edit the word list and grammar.'));
+
+    var errBox = el('div', 'lock-error');
+    errBox.style.display = 'none';
+    body.appendChild(errBox);
+
+    function showError(msg) { errBox.textContent = msg; errBox.style.display = 'block'; }
+
+    var pin = el('input', 'pin-input');
+    pin.type = 'password';
+    pin.inputMode = 'numeric';
+    pin.autocomplete = 'off';
+    pin.maxLength = 8;
+    pin.placeholder = '••••';
+    body.appendChild(pin);
+
+    if (creating) {
+      var confirmPin = el('input', 'pin-input');
+      confirmPin.type = 'password';
+      confirmPin.inputMode = 'numeric';
+      confirmPin.autocomplete = 'off';
+      confirmPin.maxLength = 8;
+      confirmPin.placeholder = 'confirm PIN';
+      body.appendChild(confirmPin);
+
+      var setBtn = el('button', 'btn red', '🔑 Set PIN and continue');
+      setBtn.type = 'button';
+      setBtn.onclick = function () {
+        var a = digitsOnly(pin.value), b = digitsOnly(confirmPin.value);
+        if (a.length < 4) return showError('Use at least 4 digits.');
+        if (a !== b) return showError('PINs do not match.');
+        hashPin(a).then(function (h) {
+          try { localStorage.setItem(PIN_KEY, h); } catch (e) {}
+          setUnlocked(true);
+          renderSetup();
+          show('setup');
+          applyUi();
+        });
+      };
+      body.appendChild(setBtn);
+    } else {
+      var goBtn = el('button', 'btn red', '🔓 Unlock');
+      goBtn.type = 'button';
+      goBtn.onclick = function () {
+        var a = digitsOnly(pin.value);
+        hashPin(a).then(function (h) {
+          try {
+            if (h === localStorage.getItem(PIN_KEY)) {
+              setUnlocked(true);
+              renderSetup();
+              show('setup');
+              applyUi();
+            } else {
+              showError('That PIN is not correct.');
+              pin.value = '';
+              pin.focus();
+            }
+          } catch (e) { showError('That PIN is not correct.'); }
+        });
+      };
+      body.appendChild(goBtn);
+      pin.addEventListener('keydown', function (e) { if (e.key === 'Enter') goBtn.click(); });
+
+      var forgot = el('button', 'lock-link', 'Forgot your PIN?');
+      forgot.type = 'button';
+      forgot.onclick = function () {
+        if (!window.confirm('Reset the teacher PIN?\n\nThis does NOT delete your saved word lists - only the PIN itself. You will set a new one immediately after.')) return;
+        try { localStorage.removeItem(PIN_KEY); } catch (e) {}
+        renderLock();
+      };
+      body.appendChild(forgot);
+    }
+
+    body.appendChild(el('div', 'lock-note',
+      'This is a light lock to stop casual tinkering, not real security - ' +
+      'CCS runs entirely in your browser with no server, so anyone who reads ' +
+      'the page’s source could bypass it. Don’t use a PIN you use anywhere else.'));
+
+    setTimeout(function () { try { pin.focus(); } catch (e) {} }, 30);
+  }
+
   /* ---------------- setup screen ---------------- */
   function renderSetup() {
     /* presets */
@@ -512,7 +653,7 @@
     row2.appendChild(button('🔁 もう いちど (same words, new story)', 'red', function () {
       gapMode = false; startStory();
     }));
-    row2.appendChild(button('✏️ ことばを かえる', 'ghost', function () { gapMode = false; show('setup'); }));
+    row2.appendChild(button('✏️ ことばを かえる', 'ghost', function () { gapMode = false; goSetup(); }));
     card.appendChild(row2);
     host.appendChild(card);
   }
@@ -564,6 +705,8 @@
     $('#t-sound').classList.toggle('on', audio.state.sfx);
     $('#t-voice').classList.toggle('on', audio.state.tts);
     $('#t-big').classList.toggle('on', ui.big);
+    $('#t-lock').classList.toggle('on', isUnlocked());
+    $('#t-lock').textContent = isUnlocked() ? '🔓 Teacher' : '🔒 Teacher';
     try { localStorage.setItem('ccs.ui', JSON.stringify({ ui: ui, sfx: audio.state.sfx, tts: audio.state.tts })); } catch (e) {}
   }
 
@@ -588,7 +731,17 @@
     $('#t-voice').onclick = function () { audio.state.tts = !audio.state.tts; if (!audio.state.tts) audio.stop(); applyUi(); };
     $('#t-big').onclick = function () { ui.big = !ui.big; applyUi(); };
     $('#start').onclick = startStory;
-    $('#back-setup').onclick = function () { audio.stop(); show('setup'); };
+    $('#back-setup').onclick = function () { audio.stop(); goSetup(); };
+    $('#t-lock').onclick = function () {
+      if (isUnlocked()) {
+        setUnlocked(false);
+        applyUi();
+        renderLock();
+        show('lock');
+      } else {
+        goSetup();
+      }
+    };
     $('#circling').onchange = function () { ui.level = this.value; applyUi(); };
     $('#share').onclick = function () {
       var url = shareLink();
@@ -625,7 +778,12 @@
     wire();
     renderSetup();
     applyUi();
-    show('setup');
+    if (isUnlocked()) {
+      show('setup');
+    } else {
+      renderLock();
+      show('lock');
+    }
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
