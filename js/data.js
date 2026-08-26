@@ -23,7 +23,14 @@
     'きもち': 'feelings', 'feeling': 'feelings', 'adj': 'feelings'
   };
 
-  function v(w, r, e, icon) { return { w: w, r: r, e: e, icon: icon }; }
+  /* personOnly marks a feelings word as a real emotion/trait that only
+   * makes sense said of someone alive - "happy", "kind" - as opposed to a
+   * descriptive quality like "fun" or "delicious" that a thing can have too. */
+  function v(w, r, e, icon, personOnly) {
+    var item = { w: w, r: r, e: e, icon: icon };
+    if (personOnly) item.personOnly = true;
+    return item;
+  }
 
   /* ---------- Default pack: works straight out of the box ---------- */
   var DEFAULT_CONFIG = {
@@ -65,10 +72,11 @@
         v('見ます', 'みます', 'watches', '👀')
       ],
       feelings: [
-        v('うれしい', 'うれしい', 'happy', '😄'),
-        v('かなしい', 'かなしい', 'sad', '😢'),
-        v('げんき', 'げんき', 'energetic', '💪'),
-        v('たいへん', 'たいへん', 'in trouble', '😱')
+        v('うれしい', 'うれしい', 'happy', '😄', true),
+        v('かなしい', 'かなしい', 'sad', '😢', true),
+        v('げんき', 'げんき', 'energetic', '💪', true),
+        v('たいへん', 'たいへん', 'in trouble', '😱'),
+        v('おいしい', 'おいしい', 'delicious', '😋')
       ]
     }
   };
@@ -104,8 +112,8 @@
                    v('お茶', 'おちゃ', 'tea', '🍵'), v('牛乳', 'ぎゅうにゅう', 'milk', '🥛')],
           actions: [v('食べます', 'たべます', 'eats', '🍴'), v('飲みます', 'のみます', 'drinks', '🥤'),
                     v('買います', 'かいます', 'buys', '🛒'), v('作ります', 'つくります', 'makes', '👨‍🍳')],
-          feelings: [v('おいしい', 'おいしい', 'delicious', '😋'), v('うれしい', 'うれしい', 'happy', '😄'),
-                     v('かなしい', 'かなしい', 'sad', '😢'), v('たいへん', 'たいへん', 'in trouble', '😱')]
+          feelings: [v('おいしい', 'おいしい', 'delicious', '😋'), v('うれしい', 'うれしい', 'happy', '😄', true),
+                     v('かなしい', 'かなしい', 'sad', '😢', true), v('たいへん', 'たいへん', 'in trouble', '😱')]
         }
       }
     },
@@ -131,7 +139,7 @@
           actions: [v('勉強します', 'べんきょうします', 'studies', '📖'), v('見ます', 'みます', 'looks at', '👀'),
                     v('聞きます', 'ききます', 'listens', '👂'), v('そうじをします', 'そうじをします', 'cleans', '🧹')],
           feelings: [v('たのしい', 'たのしい', 'fun', '😆'), v('むずかしい', 'むずかしい', 'difficult', '😵'),
-                     v('げんき', 'げんき', 'energetic', '💪'), v('かなしい', 'かなしい', 'sad', '😢')]
+                     v('げんき', 'げんき', 'energetic', '💪', true), v('かなしい', 'かなしい', 'sad', '😢', true)]
         }
       }
     },
@@ -168,7 +176,7 @@
                     v('かきます', 'かきます', 'draws', '✏️'), v('うたいます', 'うたいます', 'sings', '🎤'),
                     v('のります', 'のります', 'rides', '🚲'), v('つかいます', 'つかいます', 'uses', '📱')],
           feelings: [v('たのしい', 'たのしい', 'fun', '😆'), v('つまらない', 'つまらない', 'boring', '🥱'),
-                     v('うれしい', 'うれしい', 'happy', '😄'), v('ひま', 'ひま', 'free / not busy', '🛋️')]
+                     v('うれしい', 'うれしい', 'happy', '😄', true), v('ひま', 'ひま', 'free / not busy', '🛋️', true)]
         }
       }
     },
@@ -194,7 +202,7 @@
                     v('作ります', 'つくります', 'makes / grows', '🌱'), v('はたらきます', 'はたらきます', 'works', '💪'),
                     v('てつだいます', 'てつだいます', 'helps', '🤝')],
           feelings: [v('たいへん', 'たいへん', 'tough / hard', '😓'), v('いたい', 'いたい', 'painful', '🤕'),
-                     v('すばらしい', 'すばらしい', 'wonderful', '🌟'), v('うれしい', 'うれしい', 'happy', '😄')]
+                     v('すばらしい', 'すばらしい', 'wonderful', '🌟'), v('うれしい', 'うれしい', 'happy', '😄', true)]
         }
       }
     },
@@ -225,8 +233,8 @@
           actions: [v('説明します', 'せつめいします', 'explains', '🗣️'), v('買います', 'かいます', 'buys', '🛍️'),
                     v('撮ります', 'とります', 'takes (a photo)', '📷'), v('始めます', 'はじめます', 'starts', '🎬'),
                     v('話します', 'はなします', 'talks', '💬')],
-          feelings: [v('うれしい', 'うれしい', 'happy', '😄'), v('たのしい', 'たのしい', 'fun', '😆'),
-                     v('しんせつ', 'しんせつ', 'kind', '🤝'), v('ゆうめい', 'ゆうめい', 'famous', '⭐')]
+          feelings: [v('うれしい', 'うれしい', 'happy', '😄', true), v('たのしい', 'たのしい', 'fun', '😆'),
+                     v('しんせつ', 'しんせつ', 'kind', '🤝', true), v('ゆうめい', 'ゆうめい', 'famous', '⭐')]
         }
       }
     }

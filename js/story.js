@@ -37,13 +37,23 @@
   }
 
   /* ---------- small helpers ---------- */
-  Story.prototype.pool = function (cat) {
-    return (this.cfg.vocab && this.cfg.vocab[cat]) || [];
+  /* `describingThing` drops feelings words tagged personOnly (うれしい,
+   * しんせつ, etc.) - real emotions/traits that don't make sense said of an
+   * inanimate thing ("this okonomiyaki is happy/kind"). Falls back to the
+   * full list if a pack's feelings are all tagged that way, so a thin word
+   * pack never ends up with zero options. */
+  Story.prototype.pool = function (cat, describingThing) {
+    var list = (this.cfg.vocab && this.cfg.vocab[cat]) || [];
+    if (describingThing && cat === 'feelings') {
+      var fits = list.filter(function (x) { return !x.personOnly; });
+      if (fits.length) return fits;
+    }
+    return list;
   };
 
-  Story.prototype.options = function (cat, n, exclude) {
-    var list = JP.sample(this.pool(cat), n, exclude || []);
-    if (!list.length) list = this.pool(cat).slice(0, n);
+  Story.prototype.options = function (cat, n, exclude, describingThing) {
+    var list = JP.sample(this.pool(cat, describingThing), n, exclude || []);
+    if (!list.length) list = this.pool(cat, describingThing).slice(0, n);
     return list;
   };
 
@@ -484,7 +494,7 @@
           self.say(JP.fill(card.ja, { opt: tk(opt.item) }), card.en,
             { who: 'narrator', icon: card.icon, sfx: 'flip' });
 
-          var feelings = self.options('feelings', 3, isA ? [] : [self.st.feelingA]);
+          var feelings = self.options('feelings', 3, isA ? [] : [self.st.feelingA], true);
           self.ask({
             q: J(tk(opt.item), 'は どうですか。'),
             qEn: 'How does that option seem overall?',

@@ -698,6 +698,7 @@
     $('#t-big').onclick = function () { ui.big = !ui.big; applyUi(); };
     $('#start').onclick = startStory;
     $('#back-setup').onclick = function () { audio.stop(); show('setup'); };
+    $('#brand-home').onclick = function () { audio.stop(); show('setup'); };
     $('#circling').onchange = function () { ui.level = this.value; applyUi(); };
     $('#share').onclick = function () {
       var url = shareLink();

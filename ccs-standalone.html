@@ -73,7 +73,7 @@ body.furi-off ruby rt { opacity: 0; }
   background: var(--paper); border-radius: var(--radius);
   padding: .7rem 1rem; box-shadow: var(--shadow-sm); margin-bottom: 1rem;
 }
-.brand { display: flex; align-items: baseline; gap: .5rem; margin-right: auto; }
+.brand { display: flex; align-items: baseline; gap: .5rem; margin-right: auto; cursor: pointer; }
 .brand .logo { font-size: 1.5rem; }
 .brand h1 { font-size: 1.15rem; letter-spacing: .02em; }
 .brand small { color: var(--ink-soft); font-size: .75rem; }
@@ -125,9 +125,8 @@ body.furi-off ruby rt { opacity: 0; }
   border: 2px solid var(--line); border-radius: 14px; padding: .9rem; background: #fff;
   cursor: pointer; text-align: left; font-family: inherit; transition: .15s;
 }
-.preset:hover { border-color: var(--red); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.preset:hover { border-color: var(--red); box-shadow: var(--shadow-sm); }
 .preset.selected { border-color: var(--red); box-shadow: 0 0 0 3px rgba(224, 54, 75, .16); }
-.preset.selected:hover { transform: translateY(-2px); }
 .preset .pi { font-size: 1.8rem; }
 .preset .pn { font-weight: 800; font-size: 1.05rem; }
 .preset .pe { color: var(--ink-soft); font-size: .8rem; }
@@ -240,7 +239,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
   background: #fff; border: 3px solid var(--line); border-radius: 16px; padding: .9rem .7rem;
   cursor: pointer; font-family: inherit; text-align: center; transition: .13s; color: var(--ink);
 }
-.opt:hover { border-color: var(--blue); transform: translateY(-3px); box-shadow: var(--shadow-sm); }
+.opt:hover { border-color: var(--blue); box-shadow: var(--shadow-sm); }
 .opt .opt-icon { font-size: 2.6rem; display: block; line-height: 1.1; }
 .opt .opt-avatar { display: block; height: 92px; margin: 0 auto; }
 .opt .opt-jp { font-size: 1.25rem; font-weight: 800; display: block; margin-top: .2rem; }
@@ -318,7 +317,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
 <div class="wrap">
 
   <header class="topbar">
-    <div class="brand">
+    <div class="brand" id="brand-home" title="Back to setup">
       <span class="logo">🎴</span>
       <div>
         <h1>CCS — Co-Created Stories</h1>
@@ -612,7 +611,14 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     'きもち': 'feelings', 'feeling': 'feelings', 'adj': 'feelings'
   };
 
-  function v(w, r, e, icon) { return { w: w, r: r, e: e, icon: icon }; }
+  /* personOnly marks a feelings word as a real emotion/trait that only
+   * makes sense said of someone alive - "happy", "kind" - as opposed to a
+   * descriptive quality like "fun" or "delicious" that a thing can have too. */
+  function v(w, r, e, icon, personOnly) {
+    var item = { w: w, r: r, e: e, icon: icon };
+    if (personOnly) item.personOnly = true;
+    return item;
+  }
 
   /* ---------- Default pack: works straight out of the box ---------- */
   var DEFAULT_CONFIG = {
@@ -654,10 +660,11 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
         v('見ます', 'みます', 'watches', '👀')
       ],
       feelings: [
-        v('うれしい', 'うれしい', 'happy', '😄'),
-        v('かなしい', 'かなしい', 'sad', '😢'),
-        v('げんき', 'げんき', 'energetic', '💪'),
-        v('たいへん', 'たいへん', 'in trouble', '😱')
+        v('うれしい', 'うれしい', 'happy', '😄', true),
+        v('かなしい', 'かなしい', 'sad', '😢', true),
+        v('げんき', 'げんき', 'energetic', '💪', true),
+        v('たいへん', 'たいへん', 'in trouble', '😱'),
+        v('おいしい', 'おいしい', 'delicious', '😋')
       ]
     }
   };
@@ -693,8 +700,8 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
                    v('お茶', 'おちゃ', 'tea', '🍵'), v('牛乳', 'ぎゅうにゅう', 'milk', '🥛')],
           actions: [v('食べます', 'たべます', 'eats', '🍴'), v('飲みます', 'のみます', 'drinks', '🥤'),
                     v('買います', 'かいます', 'buys', '🛒'), v('作ります', 'つくります', 'makes', '👨‍🍳')],
-          feelings: [v('おいしい', 'おいしい', 'delicious', '😋'), v('うれしい', 'うれしい', 'happy', '😄'),
-                     v('かなしい', 'かなしい', 'sad', '😢'), v('たいへん', 'たいへん', 'in trouble', '😱')]
+          feelings: [v('おいしい', 'おいしい', 'delicious', '😋'), v('うれしい', 'うれしい', 'happy', '😄', true),
+                     v('かなしい', 'かなしい', 'sad', '😢', true), v('たいへん', 'たいへん', 'in trouble', '😱')]
         }
       }
     },
@@ -720,7 +727,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
           actions: [v('勉強します', 'べんきょうします', 'studies', '📖'), v('見ます', 'みます', 'looks at', '👀'),
                     v('聞きます', 'ききます', 'listens', '👂'), v('そうじをします', 'そうじをします', 'cleans', '🧹')],
           feelings: [v('たのしい', 'たのしい', 'fun', '😆'), v('むずかしい', 'むずかしい', 'difficult', '😵'),
-                     v('げんき', 'げんき', 'energetic', '💪'), v('かなしい', 'かなしい', 'sad', '😢')]
+                     v('げんき', 'げんき', 'energetic', '💪', true), v('かなしい', 'かなしい', 'sad', '😢', true)]
         }
       }
     },
@@ -757,7 +764,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
                     v('かきます', 'かきます', 'draws', '✏️'), v('うたいます', 'うたいます', 'sings', '🎤'),
                     v('のります', 'のります', 'rides', '🚲'), v('つかいます', 'つかいます', 'uses', '📱')],
           feelings: [v('たのしい', 'たのしい', 'fun', '😆'), v('つまらない', 'つまらない', 'boring', '🥱'),
-                     v('うれしい', 'うれしい', 'happy', '😄'), v('ひま', 'ひま', 'free / not busy', '🛋️')]
+                     v('うれしい', 'うれしい', 'happy', '😄', true), v('ひま', 'ひま', 'free / not busy', '🛋️', true)]
         }
       }
     },
@@ -783,7 +790,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
                     v('作ります', 'つくります', 'makes / grows', '🌱'), v('はたらきます', 'はたらきます', 'works', '💪'),
                     v('てつだいます', 'てつだいます', 'helps', '🤝')],
           feelings: [v('たいへん', 'たいへん', 'tough / hard', '😓'), v('いたい', 'いたい', 'painful', '🤕'),
-                     v('すばらしい', 'すばらしい', 'wonderful', '🌟'), v('うれしい', 'うれしい', 'happy', '😄')]
+                     v('すばらしい', 'すばらしい', 'wonderful', '🌟'), v('うれしい', 'うれしい', 'happy', '😄', true)]
         }
       }
     },
@@ -814,8 +821,8 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
           actions: [v('説明します', 'せつめいします', 'explains', '🗣️'), v('買います', 'かいます', 'buys', '🛍️'),
                     v('撮ります', 'とります', 'takes (a photo)', '📷'), v('始めます', 'はじめます', 'starts', '🎬'),
                     v('話します', 'はなします', 'talks', '💬')],
-          feelings: [v('うれしい', 'うれしい', 'happy', '😄'), v('たのしい', 'たのしい', 'fun', '😆'),
-                     v('しんせつ', 'しんせつ', 'kind', '🤝'), v('ゆうめい', 'ゆうめい', 'famous', '⭐')]
+          feelings: [v('うれしい', 'うれしい', 'happy', '😄', true), v('たのしい', 'たのしい', 'fun', '😆'),
+                     v('しんせつ', 'しんせつ', 'kind', '🤝', true), v('ゆうめい', 'ゆうめい', 'famous', '⭐')]
         }
       }
     }
@@ -1939,13 +1946,23 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
   }
 
   /* ---------- small helpers ---------- */
-  Story.prototype.pool = function (cat) {
-    return (this.cfg.vocab && this.cfg.vocab[cat]) || [];
+  /* `describingThing` drops feelings words tagged personOnly (うれしい,
+   * しんせつ, etc.) - real emotions/traits that don't make sense said of an
+   * inanimate thing ("this okonomiyaki is happy/kind"). Falls back to the
+   * full list if a pack's feelings are all tagged that way, so a thin word
+   * pack never ends up with zero options. */
+  Story.prototype.pool = function (cat, describingThing) {
+    var list = (this.cfg.vocab && this.cfg.vocab[cat]) || [];
+    if (describingThing && cat === 'feelings') {
+      var fits = list.filter(function (x) { return !x.personOnly; });
+      if (fits.length) return fits;
+    }
+    return list;
   };
 
-  Story.prototype.options = function (cat, n, exclude) {
-    var list = JP.sample(this.pool(cat), n, exclude || []);
-    if (!list.length) list = this.pool(cat).slice(0, n);
+  Story.prototype.options = function (cat, n, exclude, describingThing) {
+    var list = JP.sample(this.pool(cat, describingThing), n, exclude || []);
+    if (!list.length) list = this.pool(cat, describingThing).slice(0, n);
     return list;
   };
 
@@ -2386,7 +2403,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
           self.say(JP.fill(card.ja, { opt: tk(opt.item) }), card.en,
             { who: 'narrator', icon: card.icon, sfx: 'flip' });
 
-          var feelings = self.options('feelings', 3, isA ? [] : [self.st.feelingA]);
+          var feelings = self.options('feelings', 3, isA ? [] : [self.st.feelingA], true);
           self.ask({
             q: J(tk(opt.item), 'は どうですか。'),
             qEn: 'How does that option seem overall?',
@@ -3576,6 +3593,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     $('#t-big').onclick = function () { ui.big = !ui.big; applyUi(); };
     $('#start').onclick = startStory;
     $('#back-setup').onclick = function () { audio.stop(); show('setup'); };
+    $('#brand-home').onclick = function () { audio.stop(); show('setup'); };
     $('#circling').onchange = function () { ui.level = this.value; applyUi(); };
     $('#share').onclick = function () {
       var url = shareLink();

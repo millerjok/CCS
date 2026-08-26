@@ -61,7 +61,7 @@ body.furi-off ruby rt { opacity: 0; }
   background: var(--paper); border-radius: var(--radius);
   padding: .7rem 1rem; box-shadow: var(--shadow-sm); margin-bottom: 1rem;
 }
-.brand { display: flex; align-items: baseline; gap: .5rem; margin-right: auto; }
+.brand { display: flex; align-items: baseline; gap: .5rem; margin-right: auto; cursor: pointer; }
 .brand .logo { font-size: 1.5rem; }
 .brand h1 { font-size: 1.15rem; letter-spacing: .02em; }
 .brand small { color: var(--ink-soft); font-size: .75rem; }
@@ -113,9 +113,8 @@ body.furi-off ruby rt { opacity: 0; }
   border: 2px solid var(--line); border-radius: 14px; padding: .9rem; background: #fff;
   cursor: pointer; text-align: left; font-family: inherit; transition: .15s;
 }
-.preset:hover { border-color: var(--red); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.preset:hover { border-color: var(--red); box-shadow: var(--shadow-sm); }
 .preset.selected { border-color: var(--red); box-shadow: 0 0 0 3px rgba(224, 54, 75, .16); }
-.preset.selected:hover { transform: translateY(-2px); }
 .preset .pi { font-size: 1.8rem; }
 .preset .pn { font-weight: 800; font-size: 1.05rem; }
 .preset .pe { color: var(--ink-soft); font-size: .8rem; }
@@ -228,7 +227,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
   background: #fff; border: 3px solid var(--line); border-radius: 16px; padding: .9rem .7rem;
   cursor: pointer; font-family: inherit; text-align: center; transition: .13s; color: var(--ink);
 }
-.opt:hover { border-color: var(--blue); transform: translateY(-3px); box-shadow: var(--shadow-sm); }
+.opt:hover { border-color: var(--blue); box-shadow: var(--shadow-sm); }
 .opt .opt-icon { font-size: 2.6rem; display: block; line-height: 1.1; }
 .opt .opt-avatar { display: block; height: 92px; margin: 0 auto; }
 .opt .opt-jp { font-size: 1.25rem; font-weight: 800; display: block; margin-top: .2rem; }
