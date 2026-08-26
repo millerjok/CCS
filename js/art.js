@@ -21,12 +21,25 @@
   /* ---------------- Backdrops ---------------- */
   var SKIES = {
     school:  ['#bfe3ff', '#eaf7ff'],
+    primary: ['#d6f0ff', '#f2fbff'],
+    university: ['#e2e0f5', '#f7f6fc'],
+    classroom: ['#fef6e0', '#fffaf0'],
+    library: ['#efe6d8', '#faf6ef'],
     park:    ['#a8e4ff', '#e8fbe8'],
+    mountain: ['#cfe8ff', '#eef6ff'],
     shop:    ['#ffd9c0', '#fff4e6'],
     home:    ['#ffe1ec', '#fff5f8'],
+    kitchen: ['#ffe9d6', '#fff6ec'],
+    room:    ['#f0e6ff', '#faf5ff'],
     station: ['#cdd6ff', '#eef1ff'],
     food:    ['#ffe0b3', '#fff6e5'],
     sea:     ['#9fdcff', '#e6f8ff'],
+    pool:    ['#bdeeff', '#eafcff'],
+    beach:   ['#aee9ff', '#fff8e6'],
+    river:   ['#c7ecff', '#eafbff'],
+    countryside: ['#d9f0c2', '#f4fbe9'],
+    farm:    ['#ffe9b0', '#fff6df'],
+    wakayama: ['#ffd9c2', '#fff0e2'],
     town:    ['#c9e6ff', '#f2f9ff'],
     night:   ['#243b6b', '#5b6fae']
   };
@@ -105,6 +118,108 @@
       '<path d="M0 300 q40 -14 80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0" stroke="#ffffff" stroke-width="3" fill="none" opacity=".5"/>' +
       '<path d="M620 255 l40 -80 l40 80 z" fill="#8fb996"/>' +
       '</g>',
+    primary: '<g>' +
+      '<rect x="200" y="230" width="380" height="100" rx="10" fill="#fff2c2" stroke="#e0b84a" stroke-width="3"/>' +
+      '<rect x="200" y="230" width="380" height="28" fill="#4fb3d9"/>' +
+      '<rect x="360" y="260" width="60" height="70" fill="#e07a3f"/>' +
+      '<g fill="#ffe0a3" stroke="#d99a3a" stroke-width="2">' +
+      '<rect x="230" y="270" width="46" height="36"/><rect x="290" y="270" width="46" height="36"/>' +
+      '<rect x="450" y="270" width="46" height="36"/><rect x="510" y="270" width="46" height="36"/></g>' +
+      '<rect x="130" y="200" width="6" height="130" fill="#9ca3af"/>' +
+      '<path d="M136 205 L180 215 L136 225 Z" fill="#e04f5f"/>' +
+      '</g>',
+    university: '<g>' +
+      '<rect x="180" y="190" width="440" height="140" fill="#eceaf7" stroke="#b3aed1" stroke-width="3"/>' +
+      '<path d="M170 190 L400 110 L630 190 Z" fill="#c9c2e8"/>' +
+      '<g fill="#eceaf7" stroke="#b3aed1" stroke-width="3">' +
+      '<rect x="220" y="200" width="18" height="120"/><rect x="270" y="200" width="18" height="120"/>' +
+      '<rect x="320" y="200" width="18" height="120"/><rect x="460" y="200" width="18" height="120"/>' +
+      '<rect x="510" y="200" width="18" height="120"/><rect x="560" y="200" width="18" height="120"/></g>' +
+      '<rect x="370" y="240" width="60" height="90" fill="#4b4470"/>' +
+      '</g>',
+    classroom: '<g>' +
+      '<rect x="230" y="200" width="340" height="130" fill="#fdf6e3" stroke="#d9c27a" stroke-width="3"/>' +
+      '<rect x="230" y="200" width="340" height="30" fill="#3b6b4f"/>' +
+      '<rect x="270" y="245" width="260" height="70" fill="#eef3e6" stroke="#c9d6bd" stroke-width="2"/>' +
+      '<g fill="#8b5e3c"><rect x="290" y="285" width="40" height="8"/><rect x="350" y="285" width="40" height="8"/>' +
+      '<rect x="410" y="285" width="40" height="8"/><rect x="470" y="285" width="40" height="8"/></g>' +
+      '<rect x="380" y="230" width="60" height="10" fill="#2f4f3a"/>' +
+      '</g>',
+    library: '<g>' +
+      '<rect x="210" y="180" width="380" height="150" fill="#f3e7cf" stroke="#c9a86a" stroke-width="3"/>' +
+      '<path d="M200 180 L400 120 L600 180 Z" fill="#d9bd8a"/>' +
+      '<rect x="250" y="220" width="24" height="110" fill="#c9a86a"/><rect x="300" y="220" width="24" height="110" fill="#c9a86a"/>' +
+      '<rect x="480" y="220" width="24" height="110" fill="#c9a86a"/><rect x="530" y="220" width="24" height="110" fill="#c9a86a"/>' +
+      '<rect x="360" y="270" width="80" height="16" fill="#e04f5f"/><rect x="365" y="254" width="70" height="16" fill="#2b6cb0"/>' +
+      '<rect x="360" y="238" width="80" height="16" fill="#2f9e6f"/>' +
+      '</g>',
+    mountain: '<g>' +
+      '<path d="M100 330 L300 120 L420 260 L520 150 L700 330 Z" fill="#8fa3b8"/>' +
+      '<path d="M300 120 L340 190 L260 190 Z" fill="#ffffff"/>' +
+      '<path d="M520 150 L550 200 L490 200 Z" fill="#ffffff"/>' +
+      '<path d="M0 330 q60 -20 120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t80 0" fill="#7fae7f"/>' +
+      '</g>',
+    kitchen: '<g>' +
+      '<rect x="260" y="210" width="280" height="120" fill="#fff0dc" stroke="#e0b98a" stroke-width="3"/>' +
+      '<path d="M250 210 L400 150 L550 210 Z" fill="#e2795a"/>' +
+      '<rect x="300" y="240" width="60" height="50" fill="#bfe6ff" stroke="#7aa9c9" stroke-width="2"/>' +
+      '<rect x="440" y="240" width="60" height="50" fill="#bfe6ff" stroke="#7aa9c9" stroke-width="2"/>' +
+      '<ellipse cx="330" cy="235" rx="14" ry="6" fill="#8b5e3c"/>' +
+      '<path d="M320 228 q4 -14 -2 -20 M330 228 q4 -18 0 -24 M340 228 q4 -14 -2 -20" stroke="#d9d9d9" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+      '</g>',
+    room: '<g>' +
+      '<rect x="290" y="220" width="220" height="110" fill="#fbeeff" stroke="#d9b9e6" stroke-width="3"/>' +
+      '<path d="M280 220 L400 170 L520 220 Z" fill="#c98bd9"/>' +
+      '<circle cx="400" cy="260" r="30" fill="#bfe6ff" stroke="#7aa9c9" stroke-width="3"/>' +
+      '<path d="M394 250 a10 10 0 1 0 12 14 a13 13 0 1 1 -12 -14" fill="#fff6c9"/>' +
+      '</g>',
+    pool: '<g>' +
+      '<rect x="90" y="235" width="30" height="140" fill="#e8dcc0"/>' +
+      '<rect x="120" y="250" width="560" height="110" rx="14" fill="#3bb6e0" stroke="#1f7fa8" stroke-width="4"/>' +
+      '<g stroke="#ffffff" stroke-width="4" opacity=".8">' +
+      '<line x1="130" y1="280" x2="670" y2="280"/><line x1="130" y1="305" x2="670" y2="305"/><line x1="130" y1="330" x2="670" y2="330"/></g>' +
+      '</g>',
+    beach: '<g>' +
+      '<rect y="290" width="800" height="160" fill="#f4e2b0"/>' +
+      '<rect y="330" width="800" height="120" fill="#4bb3e0"/>' +
+      '<path d="M0 340 q40 -10 80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0" stroke="#ffffff" stroke-width="3" fill="none" opacity=".7"/>' +
+      '<path d="M600 300 L600 240" stroke="#8b5e3c" stroke-width="6"/>' +
+      '<path d="M600 240 q60 10 60 50 q-60 -30 -120 0 q0 -40 60 -50 z" fill="#e04f5f"/>' +
+      '<ellipse cx="200" cy="310" rx="26" ry="10" fill="#f7d9a0"/>' +
+      '</g>',
+    river: '<g>' +
+      '<rect y="255" width="800" height="195" fill="#8fc78f"/>' +
+      '<path d="M0 300 q100 -40 180 0 t180 20 t180 -30 t180 20 t80 -10 V450 H0 Z" fill="#5cb8e0"/>' +
+      '<path d="M0 300 q100 -40 180 0 t180 20 t180 -30 t180 20 t80 -10" stroke="#bfe8ff" stroke-width="4" fill="none" opacity=".7"/>' +
+      '<circle cx="640" cy="270" r="22" fill="#8b6f4e"/><circle cx="120" cy="280" r="16" fill="#8b6f4e"/>' +
+      '</g>',
+    countryside: '<g>' +
+      '<rect y="300" width="800" height="150" fill="#cfe0a0"/>' +
+      '<path d="M580 300 L640 220 L700 300 Z" fill="#9fc0e0"/>' +
+      '<g stroke="#a9c47a" stroke-width="3">' +
+      '<line x1="0" y1="320" x2="800" y2="320"/><line x1="0" y1="345" x2="800" y2="345"/>' +
+      '<line x1="0" y1="370" x2="800" y2="370"/><line x1="0" y1="395" x2="800" y2="395"/>' +
+      '<line x1="0" y1="420" x2="800" y2="420"/></g>' +
+      '<circle cx="150" cy="280" r="10" fill="#e8a13a"/><circle cx="180" cy="285" r="8" fill="#e8a13a"/>' +
+      '</g>',
+    farm: '<g>' +
+      '<rect y="330" width="800" height="120" fill="#d8c98a"/>' +
+      '<rect x="520" y="200" width="50" height="130" rx="20" fill="#d9d9d9" stroke="#aaaaaa" stroke-width="3"/>' +
+      '<path d="M520 200 a25 15 0 0 1 50 0" fill="#b3413a"/>' +
+      '<rect x="280" y="230" width="200" height="100" fill="#c0392b" stroke="#8e2a20" stroke-width="3"/>' +
+      '<path d="M270 230 L380 170 L490 230 Z" fill="#8e2a20"/>' +
+      '<rect x="360" y="270" width="50" height="60" fill="#5a3a24"/>' +
+      '</g>',
+    wakayama: '<g>' +
+      '<path d="M220 330 q180 -220 360 0 Z" fill="#8fae7f"/>' +
+      '<rect x="160" y="290" width="480" height="40" fill="#c9c2ad"/>' +
+      '<rect x="200" y="270" width="24" height="60" fill="#b3ab94"/><rect x="576" y="270" width="24" height="60" fill="#b3ab94"/>' +
+      '<rect x="350" y="180" width="100" height="110" fill="#eceaea" stroke="#9c9c9c" stroke-width="2"/>' +
+      '<path d="M335 180 L400 130 L465 180 Z" fill="#3b3b3b"/>' +
+      '<rect x="378" y="140" width="44" height="42" fill="#eceaea" stroke="#9c9c9c" stroke-width="2"/>' +
+      '<path d="M368 140 L400 108 L432 140 Z" fill="#3b3b3b"/>' +
+      '<rect x="360" y="205" width="80" height="14" fill="#c0392b"/>' +
+      '</g>',
     town: '<g>' +
       '<rect x="120" y="170" width="110" height="165" fill="#e9d8c3" stroke="#c9a86a" stroke-width="2"/>' +
       '<rect x="250" y="130" width="130" height="205" fill="#f6e7c9" stroke="#c9a86a" stroke-width="2"/>' +
@@ -120,10 +235,16 @@
       '</g>'
   };
 
+  var GROUND = {
+    sea: '#f3e2b8', park: '#8fd18f', mountain: '#7fae7f', beach: '#f4e2b0',
+    pool: '#dce9e0', river: '#8fc78f', countryside: '#cfe0a0', farm: '#d8c98a',
+    wakayama: '#c9c2ad'
+  };
+
   function backdrop(kind, props) {
     kind = SETS[kind] ? kind : 'town';
     var sky = SKIES[kind] || SKIES.town;
-    var ground = kind === 'sea' ? '#f3e2b8' : (kind === 'park' ? '#8fd18f' : '#cfd6c2');
+    var ground = GROUND[kind] || '#cfd6c2';
     var svg = '<svg class="backdrop" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' +
       '<defs><linearGradient id="sky-' + kind + '" x1="0" y1="0" x2="0" y2="1">' +
       '<stop offset="0%" stop-color="' + sky[0] + '"/><stop offset="100%" stop-color="' + sky[1] + '"/>' +

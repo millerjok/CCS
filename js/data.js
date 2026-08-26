@@ -179,7 +179,7 @@
       icon: '🚜',
       config: {
         title: 'ファームステイの けいけん',
-        targets: ['{もの}を 作[つく]ります', '{ばしょ}で {どうし}', 'しごとは {きもち}です'],
+        targets: ['{もの}を 作[つく]ります', '{ばしょ}に 住[す]んでいます', 'しごとは {きもち}です'],
         vocab: {
           people: [v('学生', 'がくせい', 'student', '🧑‍🎓'), v('ボランティア', 'ボランティア', 'volunteer', '🙋'),
                    v('農家の人', 'のうかの ひと', 'farmer', '👨‍🌾'), v('青山さん', 'あおやまさん', 'host (Aoyama-san)', '🧑‍🌾'),
@@ -244,18 +244,46 @@
   ];
 
   /* ---------- Backdrops: place -> scene kind ---------- */
+  /* Every place word that ships in a built-in pack gets its own dedicated
+   * backdrop (see art.js SETS) rather than being bucketed with others -
+   * exact match on the kana reading, since that's what a teacher can't
+   * easily mistype away from. Custom teacher-typed places that don't
+   * match fall through to the fuzzy keyword list below. */
+  var PLACE_KIND = {
+    'がっこう': 'school', 'しょうがっこう': 'primary', 'だいがく': 'university',
+    'きょうしつ': 'classroom', 'としょかん': 'library',
+    'こうえん': 'park', 'みせ': 'shop', 'うち': 'home', 'いえ': 'home',
+    'だいどころ': 'kitchen', 'へや': 'room', 'えき': 'station',
+    'レストラン': 'food', 'うみ': 'sea', 'プール': 'pool', 'ビーチ': 'beach',
+    'やま': 'mountain', 'かわ': 'river', 'いなか': 'countryside',
+    'のうじょう': 'farm', 'わかやま': 'wakayama'
+  };
+
   var SCENE_KEYS = [
-    { kind: 'school', match: ['school', 'classroom', 'がっこう', '学校', 'きょうしつ', 'university', 'だいがく', 'library', 'としょかん'] },
-    { kind: 'park',   match: ['park', 'こうえん', '公園', 'garden', 'mountain', 'やま', '山'] },
+    { kind: 'school', match: ['school', 'がっこう', '学校'] },
+    { kind: 'classroom', match: ['classroom'] },
+    { kind: 'university', match: ['university'] },
+    { kind: 'library', match: ['library'] },
+    { kind: 'park',   match: ['park', 'こうえん', '公園', 'garden'] },
+    { kind: 'mountain', match: ['mountain', 'やま', '山'] },
     { kind: 'shop',   match: ['shop', 'store', 'みせ', '店', 'supermarket', 'コンビニ', 'mall'] },
-    { kind: 'home',   match: ['home', 'house', 'うち', 'いえ', '家', 'kitchen', 'だいどころ', 'room', 'へや'] },
+    { kind: 'home',   match: ['home', 'house', 'うち', 'いえ', '家'] },
+    { kind: 'kitchen', match: ['kitchen', 'だいどころ'] },
+    { kind: 'room', match: ['bedroom', 'room', 'へや'] },
     { kind: 'station', match: ['station', 'えき', '駅', 'train', 'airport', 'くうこう'] },
     { kind: 'food',   match: ['restaurant', 'レストラン', 'cafe', 'カフェ', 'ラーメンや'] },
-    { kind: 'sea',    match: ['sea', 'beach', 'うみ', '海', 'pool', 'プール', 'river', 'かわ'] }
+    { kind: 'sea',    match: ['sea', 'ocean', 'うみ', '海'] },
+    { kind: 'pool',   match: ['pool', 'プール'] },
+    { kind: 'beach',  match: ['beach', 'ビーチ'] },
+    { kind: 'river',  match: ['river', 'かわ', '川'] },
+    { kind: 'farm',   match: ['farm', 'のうじょう'] },
+    { kind: 'countryside', match: ['countryside', 'rural', 'いなか'] }
   ];
 
   function sceneKindFor(item) {
     if (!item) return 'town';
+    var r = (item.r || '').trim();
+    if (PLACE_KIND[r]) return PLACE_KIND[r];
     var hay = ((item.w || '') + ' ' + (item.r || '') + ' ' + (item.e || '')).toLowerCase();
     for (var i = 0; i < SCENE_KEYS.length; i++) {
       for (var j = 0; j < SCENE_KEYS[i].match.length; j++) {
