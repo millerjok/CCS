@@ -129,14 +129,30 @@
     if (cloud && cloud.enabled()) renderCloudPublish();
   }
 
+  var CAT_LABEL = { things: 'Things', places: 'Places', people: 'People', actions: 'Verbs', feelings: 'Feelings' };
+
+  /* "{もの}を 作[つく]ります" -> tokens for "(Things)を 作ります", so the card
+   * shows the shape of the structure rather than one randomly-picked word. */
+  function templateShapeTokens(tmpl) {
+    var out = [], re = /\{([^}]+)\}/g, last = 0, m, cat;
+    tmpl = String(tmpl || '');
+    while ((m = re.exec(tmpl)) !== null) {
+      out = out.concat(R.parse(tmpl.slice(last, m.index)));
+      cat = D.SLOTS[m[1].trim()];
+      out = out.concat(R.parse('(' + (CAT_LABEL[cat] || m[1]) + ')'));
+      last = m.index + m[0].length;
+    }
+    return out.concat(R.parse(tmpl.slice(last)));
+  }
+
   /* Target grammar is fixed per word pack, not teacher-editable — this just
-   * displays the pack's own structure with a real example filled in. */
+   * displays the pack's own structure. */
   function targetRow(i) {
     var wrap = el('div', 'target-row');
     wrap.appendChild(el('div', 'idx', String(i + 1)));
     var tmpl = (config.targets && config.targets[i]) || '';
     var prev = el('div', 'preview jp');
-    if (tmpl) prev.innerHTML = line(JP.parseTarget(tmpl, config.vocab).build(null));
+    if (tmpl) prev.innerHTML = line(templateShapeTokens(tmpl));
     wrap.appendChild(prev);
     return wrap;
   }
@@ -147,7 +163,7 @@
     D.CATS.forEach(function (cat) {
       var list = config.vocab[cat.key] = config.vocab[cat.key] || [];
       var det = el('details', 'cat');
-      if (cat.key === 'people' || cat.key === 'places' || cat.key === 'things') det.open = true;
+      det.open = true;
       det.appendChild(el('summary', null,
         '<span>' + cat.icon + '</span><span>' + cat.ja + ' — ' + R.escapeHtml(cat.en) + '</span>' +
         '<span class="count">' + list.length + '</span>'));
