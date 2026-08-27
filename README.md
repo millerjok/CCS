@@ -61,10 +61,11 @@ that shared login, since it's meant to be told to colleagues.
 ## How a lesson runs
 
 **1. Before the lesson — put your language in.**
-Pick a starter pack (three ready-made packs are built in), then edit the word lists and
-the 2–3 target structures you actually want drilled. Everything is saved in the browser,
-and 🔗 *リンクを コピー* gives you a link that carries the whole pack, so you can share it
-with a colleague or open it on the classroom machine.
+Pick a starter pack (built-in packs are listed in Setup step 1), then edit the word lists.
+Everything is saved in the browser, and 🔗 *リンクを コピー* gives you a link that carries the
+whole pack, so you can share it with a colleague or open it on the classroom machine. If a
+built-in pack gets a fix after you've already saved a copy of it, Setup shows a "this pack
+has been updated" banner with the choice to pull in the fix or keep what you've got.
 
 **2. In the lesson — press スタート.**
 The class decides everything: who the character is, their name, what they want, where they

@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/ccs.css?v=12">
+<link rel="stylesheet" href="css/ccs.css?v=13">
 </head>
 <body>
 <div class="wrap">
@@ -47,6 +47,15 @@
       <h2><span class="num">1</span>Choose a word pack</h2>
       <div class="sub">Start from a ready-made pack, then edit anything below. Your changes are saved in this browser.</div>
       <div class="presets" id="presets"></div>
+    </div>
+
+    <div class="card" id="update-card" style="display:none">
+      <h2>🔄 This pack has been updated</h2>
+      <div class="sub" id="update-status"></div>
+      <div class="row" style="margin-top:.6rem">
+        <button class="btn" id="update-apply" type="button">Update this pack</button>
+        <button class="btn ghost" id="update-dismiss" type="button">Keep my version</button>
+      </div>
     </div>
 
     <div class="card">
@@ -133,13 +142,13 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js" defer></script>
 
-<script src="js/furigana.js?v=12"></script>
-<script src="js/data.js?v=12"></script>
-<script src="js/jp.js?v=12"></script>
-<script src="js/art.js?v=12"></script>
-<script src="js/audio.js?v=12"></script>
-<script src="js/story.js?v=12"></script>
-<script src="js/cloud.js?v=12" defer></script>
-<script src="js/app.js?v=12" defer></script>
+<script src="js/furigana.js?v=13"></script>
+<script src="js/data.js?v=13"></script>
+<script src="js/jp.js?v=13"></script>
+<script src="js/art.js?v=13"></script>
+<script src="js/audio.js?v=13"></script>
+<script src="js/story.js?v=13"></script>
+<script src="js/cloud.js?v=13" defer></script>
+<script src="js/app.js?v=13" defer></script>
 </body>
 </html>

@@ -46,6 +46,15 @@
   /* ---------------- config storage ---------------- */
   function cloneConfig(c) { return JSON.parse(JSON.stringify(c)); }
 
+  /* Stamps which built-in preset a config was cloned from, and at what
+   * rev - lets a later visit notice the built-in pack has since changed
+   * (see checkStalePack/renderUpdateBanner) instead of silently keeping
+   * whatever this browser saved forever, even after a real bug fix. */
+  function stampSource(cfg, preset) {
+    cfg.sourcePresetId = preset.id;
+    cfg.sourceRev = preset.rev || 1;
+  }
+
   function loadConfig() {
     var fromUrl = readHash();
     if (fromUrl) return fromUrl;
@@ -53,11 +62,44 @@
       var raw = localStorage.getItem(STORE);
       if (raw) return JSON.parse(raw);
     } catch (e) {}
-    return cloneConfig(D.DEFAULT_CONFIG);
+    var c = cloneConfig(D.DEFAULT_CONFIG);
+    var starter = D.PRESETS.filter(function (p) { return p.id === 'default'; })[0];
+    if (starter) stampSource(c, starter);
+    return c;
   }
 
   function saveConfig() {
     try { localStorage.setItem(STORE, JSON.stringify(config)); } catch (e) {}
+  }
+
+  /* Returns the current (fresh) preset definition if this browser's saved
+   * copy of it predates a fix, or null if there's nothing to update -
+   * either the config isn't from a built-in preset at all (a custom pack,
+   * or a shared link), or it's already current.
+   * A config saved before this feature existed has no sourcePresetId at
+   * all; ui.preset (saved separately, restored on load) still says which
+   * pack was last selected, so fall back to that with an assumed rev of
+   * 0 - this is what actually surfaces the update for a browser that's
+   * already stale today, not just ones that go stale from here on. */
+  function checkStalePack() {
+    var sourceId = config.sourcePresetId || ui.preset;
+    if (!sourceId) return null;
+    var current = D.PRESETS.filter(function (p) { return p.id === sourceId; })[0];
+    if (!current || !current.rev) return null;
+    var sourceRev = config.sourcePresetId ? (config.sourceRev || 0) : 0;
+    if (sourceRev >= current.rev) return null;
+    return current;
+  }
+
+  function renderUpdateBanner() {
+    var card = $('#update-card');
+    if (!card) return;
+    var stale = checkStalePack();
+    if (!stale) { card.style.display = 'none'; return; }
+    card.style.display = '';
+    $('#update-status').textContent =
+      'The built-in "' + stale.name + '" pack has changed since you saved this copy - ' +
+      'a word or grammar line may have been fixed. Update to get the latest, or keep your own version.';
   }
 
   function readHash() {
@@ -90,6 +132,7 @@
       b.type = 'button';
       b.onclick = function () {
         config = cloneConfig(p.config);
+        stampSource(config, p);
         ui.preset = p.id;
         saveConfig();
         applyUi();
@@ -97,6 +140,8 @@
       };
       box.appendChild(b);
     });
+
+    renderUpdateBanner();
 
     /* story shapes */
     var skelBox = $('#skeletons');
@@ -791,7 +836,21 @@
        * version" for a pack a browser saved a copy of a while ago. */
       var current = D.PRESETS.filter(function (p) { return p.id === ui.preset; })[0];
       config = cloneConfig(current ? current.config : D.DEFAULT_CONFIG);
+      if (current) stampSource(config, current);
       saveConfig(); renderSetup();
+    };
+    $('#update-apply').onclick = function () {
+      var stale = checkStalePack();
+      if (!stale) return;
+      config = cloneConfig(stale.config);
+      stampSource(config, stale);
+      saveConfig(); renderSetup();
+    };
+    $('#update-dismiss').onclick = function () {
+      var stale = checkStalePack();
+      if (!stale) return;
+      stampSource(config, stale);
+      saveConfig(); renderUpdateBanner();
     };
 
     document.addEventListener('keydown', function (e) {

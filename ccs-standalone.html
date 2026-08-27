@@ -351,6 +351,15 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       <div class="presets" id="presets"></div>
     </div>
 
+    <div class="card" id="update-card" style="display:none">
+      <h2>🔄 This pack has been updated</h2>
+      <div class="sub" id="update-status"></div>
+      <div class="row" style="margin-top:.6rem">
+        <button class="btn" id="update-apply" type="button">Update this pack</button>
+        <button class="btn ghost" id="update-dismiss" type="button">Keep my version</button>
+      </div>
+    </div>
+
     <div class="card">
       <h2><span class="num">2</span>Story shape</h2>
       <div class="sub">The skeleton the class's decisions get poured into. All four are built the same way underneath — decide, hear it circled back, move on.</div>
@@ -670,13 +679,19 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     }
   };
 
-  /* ---------- Presets built from the iitomo 2 word lists ---------- */
+  /* ---------- Presets built from the iitomo 2 word lists ----------
+   * `rev` marks the built-in version of a preset's own config. Bump a
+   * preset's rev whenever you edit ITS config (vocab, targets, title) -
+   * a browser that saved a copy at an older rev gets offered the update
+   * in Setup (see app.js checkStalePack/renderUpdateBanner) instead of
+   * silently keeping stale content forever. */
   var PRESETS = [
     {
       id: 'default',
       name: 'ラーメンが ほしい！',
       en: 'Starter pack (food + town)',
       icon: '🍜',
+      rev: 1,
       config: DEFAULT_CONFIG
     },
     {
@@ -684,6 +699,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       name: 'たべもの',
       en: 'iitomo 2 — Food & drink',
       icon: '🍱',
+      rev: 1,
       config: {
         title: 'おなかが すきました！',
         targets: ['{もの}を 食[た]べます', '{もの}が 好[す]きです', 'とても おいしいです'],
@@ -711,6 +727,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       name: 'がっこう',
       en: 'iitomo 2 — School & subjects',
       icon: '🏫',
+      rev: 1,
       config: {
         title: 'しゅくだいが ありません！',
         targets: ['{もの}が あります', '{ばしょ}に 行[い]きます', 'とても むずかしいです'],
@@ -737,6 +754,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       name: 'しゅみ',
       en: 'iitomo 2 — Hobbies & free time',
       icon: '🎮',
+      rev: 1,
       config: {
         title: 'ひまな 土よう日',
         targets: ['{もの}が 好[す]きです', '{ばしょ}で {どうし}', 'ぜんぜん おもしろくないです'],
@@ -774,6 +792,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       name: 'ファームステイ',
       en: 'Farm Stay Experience',
       icon: '🚜',
+      rev: 1,
       config: {
         title: 'ファームステイの けいけん',
         targets: ['{もの}を 作[つく]ります', '{ばしょ}に 住[す]んでいます', 'しごとは {きもち}です'],
@@ -800,6 +819,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       name: '広島',
       en: 'Hiroshima Trip (email home)',
       icon: '⛩️',
+      rev: 1,
       config: {
         title: '広島への たび',
         targets: [
@@ -832,6 +852,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       name: 'ひまな じかん',
       en: 'Free time & frequency (how often, how was your holiday)',
       icon: '🗓️',
+      rev: 1,
       config: {
         title: '去年の 休み',
         /* あまり/ぜんぜん ~ません need real verb conjugation (ます -> ません),
@@ -3006,6 +3027,15 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
   /* ---------------- config storage ---------------- */
   function cloneConfig(c) { return JSON.parse(JSON.stringify(c)); }
 
+  /* Stamps which built-in preset a config was cloned from, and at what
+   * rev - lets a later visit notice the built-in pack has since changed
+   * (see checkStalePack/renderUpdateBanner) instead of silently keeping
+   * whatever this browser saved forever, even after a real bug fix. */
+  function stampSource(cfg, preset) {
+    cfg.sourcePresetId = preset.id;
+    cfg.sourceRev = preset.rev || 1;
+  }
+
   function loadConfig() {
     var fromUrl = readHash();
     if (fromUrl) return fromUrl;
@@ -3013,11 +3043,44 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       var raw = localStorage.getItem(STORE);
       if (raw) return JSON.parse(raw);
     } catch (e) {}
-    return cloneConfig(D.DEFAULT_CONFIG);
+    var c = cloneConfig(D.DEFAULT_CONFIG);
+    var starter = D.PRESETS.filter(function (p) { return p.id === 'default'; })[0];
+    if (starter) stampSource(c, starter);
+    return c;
   }
 
   function saveConfig() {
     try { localStorage.setItem(STORE, JSON.stringify(config)); } catch (e) {}
+  }
+
+  /* Returns the current (fresh) preset definition if this browser's saved
+   * copy of it predates a fix, or null if there's nothing to update -
+   * either the config isn't from a built-in preset at all (a custom pack,
+   * or a shared link), or it's already current.
+   * A config saved before this feature existed has no sourcePresetId at
+   * all; ui.preset (saved separately, restored on load) still says which
+   * pack was last selected, so fall back to that with an assumed rev of
+   * 0 - this is what actually surfaces the update for a browser that's
+   * already stale today, not just ones that go stale from here on. */
+  function checkStalePack() {
+    var sourceId = config.sourcePresetId || ui.preset;
+    if (!sourceId) return null;
+    var current = D.PRESETS.filter(function (p) { return p.id === sourceId; })[0];
+    if (!current || !current.rev) return null;
+    var sourceRev = config.sourcePresetId ? (config.sourceRev || 0) : 0;
+    if (sourceRev >= current.rev) return null;
+    return current;
+  }
+
+  function renderUpdateBanner() {
+    var card = $('#update-card');
+    if (!card) return;
+    var stale = checkStalePack();
+    if (!stale) { card.style.display = 'none'; return; }
+    card.style.display = '';
+    $('#update-status').textContent =
+      'The built-in "' + stale.name + '" pack has changed since you saved this copy - ' +
+      'a word or grammar line may have been fixed. Update to get the latest, or keep your own version.';
   }
 
   function readHash() {
@@ -3050,6 +3113,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       b.type = 'button';
       b.onclick = function () {
         config = cloneConfig(p.config);
+        stampSource(config, p);
         ui.preset = p.id;
         saveConfig();
         applyUi();
@@ -3057,6 +3121,8 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       };
       box.appendChild(b);
     });
+
+    renderUpdateBanner();
 
     /* story shapes */
     var skelBox = $('#skeletons');
@@ -3751,7 +3817,21 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
        * version" for a pack a browser saved a copy of a while ago. */
       var current = D.PRESETS.filter(function (p) { return p.id === ui.preset; })[0];
       config = cloneConfig(current ? current.config : D.DEFAULT_CONFIG);
+      if (current) stampSource(config, current);
       saveConfig(); renderSetup();
+    };
+    $('#update-apply').onclick = function () {
+      var stale = checkStalePack();
+      if (!stale) return;
+      config = cloneConfig(stale.config);
+      stampSource(config, stale);
+      saveConfig(); renderSetup();
+    };
+    $('#update-dismiss').onclick = function () {
+      var stale = checkStalePack();
+      if (!stale) return;
+      stampSource(config, stale);
+      saveConfig(); renderUpdateBanner();
     };
 
     document.addEventListener('keydown', function (e) {

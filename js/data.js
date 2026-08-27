@@ -81,13 +81,19 @@
     }
   };
 
-  /* ---------- Presets built from the iitomo 2 word lists ---------- */
+  /* ---------- Presets built from the iitomo 2 word lists ----------
+   * `rev` marks the built-in version of a preset's own config. Bump a
+   * preset's rev whenever you edit ITS config (vocab, targets, title) -
+   * a browser that saved a copy at an older rev gets offered the update
+   * in Setup (see app.js checkStalePack/renderUpdateBanner) instead of
+   * silently keeping stale content forever. */
   var PRESETS = [
     {
       id: 'default',
       name: 'ラーメンが ほしい！',
       en: 'Starter pack (food + town)',
       icon: '🍜',
+      rev: 1,
       config: DEFAULT_CONFIG
     },
     {
@@ -95,6 +101,7 @@
       name: 'たべもの',
       en: 'iitomo 2 — Food & drink',
       icon: '🍱',
+      rev: 1,
       config: {
         title: 'おなかが すきました！',
         targets: ['{もの}を 食[た]べます', '{もの}が 好[す]きです', 'とても おいしいです'],
@@ -122,6 +129,7 @@
       name: 'がっこう',
       en: 'iitomo 2 — School & subjects',
       icon: '🏫',
+      rev: 1,
       config: {
         title: 'しゅくだいが ありません！',
         targets: ['{もの}が あります', '{ばしょ}に 行[い]きます', 'とても むずかしいです'],
@@ -148,6 +156,7 @@
       name: 'しゅみ',
       en: 'iitomo 2 — Hobbies & free time',
       icon: '🎮',
+      rev: 1,
       config: {
         title: 'ひまな 土よう日',
         targets: ['{もの}が 好[す]きです', '{ばしょ}で {どうし}', 'ぜんぜん おもしろくないです'],
@@ -185,6 +194,7 @@
       name: 'ファームステイ',
       en: 'Farm Stay Experience',
       icon: '🚜',
+      rev: 1,
       config: {
         title: 'ファームステイの けいけん',
         targets: ['{もの}を 作[つく]ります', '{ばしょ}に 住[す]んでいます', 'しごとは {きもち}です'],
@@ -211,6 +221,7 @@
       name: '広島',
       en: 'Hiroshima Trip (email home)',
       icon: '⛩️',
+      rev: 1,
       config: {
         title: '広島への たび',
         targets: [
@@ -243,6 +254,7 @@
       name: 'ひまな じかん',
       en: 'Free time & frequency (how often, how was your holiday)',
       icon: '🗓️',
+      rev: 1,
       config: {
         title: '去年の 休み',
         /* あまり/ぜんぜん ~ません need real verb conjugation (ます -> ません),
