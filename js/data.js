@@ -244,7 +244,7 @@
       en: 'Free time & frequency (how often, how was your holiday)',
       icon: '🗓️',
       config: {
-        title: 'きょ年の 休み',
+        title: '去年の 休み',
         /* あまり/ぜんぜん ~ません need real verb conjugation (ます -> ません),
          * which the template engine can't do by concatenation, so the
          * automated targets stick to the affirmative frequency words -
@@ -255,7 +255,7 @@
           'しゅうまつに、たいてい {どうし}',
           'ひまな 時[とき]は、よく {どうし}',
           '休[やす]みに、ときどき {ばしょ}に 行[い]きます',
-          'きょ年の 休[やす]みは {きもち}です'
+          '去年[きょねん]の 休[やす]みは {きもち}です'
         ],
         vocab: {
           people: [v('学生', 'がくせい', 'student', '🧑‍🎓'), v('友だち', 'ともだち', 'friend', '🧑‍🤝‍🧑'),
