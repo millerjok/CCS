@@ -267,9 +267,17 @@
           things: [v('しゅみ', 'しゅみ', 'a hobby', '🎨'), v('りょうり', 'りょうり', 'cooking', '🍳'),
                    v('どくしょ', 'どくしょ', 'reading (as a hobby)', '📚'), v('つり', 'つり', 'fishing', '🎣'),
                    v('はれ', 'はれ', 'fine weather', '☀️'), v('くもり', 'くもり', 'cloudy', '☁️')],
-          actions: [v('つくります', 'つくります', 'makes (cake / sushi)', '🍰'), v('ひきます', 'ひきます', 'plays (guitar / piano)', '🎸'),
-                    v('とります', 'とります', 'takes (a photo)', '📷'), v('かきます', 'かきます', 'draws (a picture)', '✏️'),
-                    v('うたいます', 'うたいます', 'sings (a song)', '🎤'), v('さんぽを します', 'さんぽを します', 'has a walk', '🚶')],
+          /* Bare つくります/ひきます/とります/かきます/うたいます read as
+           * incomplete sentences once slotted into a frequency target
+           * ("usually makes!" - makes what?) - the sheet itself always
+           * pairs these with an object (しゃしんを とります, えを かきます,
+           * うたを うたいます), so every entry here does the same. */
+          actions: [v('ケーキを つくります', 'ケーキを つくります', 'makes a cake', '🍰'),
+                    v('ギターを ひきます', 'ギターを ひきます', 'plays the guitar', '🎸'),
+                    v('しゃしんを とります', 'しゃしんを とります', 'takes photos', '📷'),
+                    v('えを かきます', 'えを かきます', 'draws a picture', '✏️'),
+                    v('うたを うたいます', 'うたを うたいます', 'sings a song', '🎤'),
+                    v('さんぽを します', 'さんぽを します', 'has a walk', '🚶')],
           /* All four are stored as the plain i-adjective past form, since
            * "{きもち}です" appends です straight after - correct for an
            * i-adjective (たのしかった + です), but a na-adjective like
