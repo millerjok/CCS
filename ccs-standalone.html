@@ -826,6 +826,48 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
                      v('しんせつ', 'しんせつ', 'kind', '🤝', true), v('ゆうめい', 'ゆうめい', 'famous', '⭐')]
         }
       }
+    },
+    {
+      id: 'freetime',
+      name: 'ひまな じかん',
+      en: 'Free time & frequency (how often, how was your holiday)',
+      icon: '🗓️',
+      config: {
+        title: 'きょ年の 休み',
+        /* あまり/ぜんぜん ~ません need real verb conjugation (ます -> ません),
+         * which the template engine can't do by concatenation, so the
+         * automated targets stick to the affirmative frequency words -
+         * still exercises いつも/たいてい/よく/ときどき plus the past-tense
+         * holiday-recap line. */
+        targets: [
+          'あさ、いつも {どうし}',
+          'しゅうまつに、たいてい {どうし}',
+          'ひまな 時[とき]は、よく {どうし}',
+          '休[やす]みに、ときどき {ばしょ}に 行[い]きます',
+          'きょ年の 休[やす]みは {きもち}です'
+        ],
+        vocab: {
+          people: [v('学生', 'がくせい', 'student', '🧑‍🎓'), v('友だち', 'ともだち', 'friend', '🧑‍🤝‍🧑'),
+                   v('家族', 'かぞく', 'family', '👪'), v('先生', 'せんせい', 'teacher', '👩‍🏫'),
+                   v('クラスメート', 'クラスメート', 'classmate', '🧑‍🎓')],
+          places: [v('へや', 'へや', 'room', '🚪'), v('うみ', 'うみ', 'sea / ocean', '🌊'),
+                   v('ビーチ', 'ビーチ', 'beach', '🏖️'), v('山', 'やま', 'mountain', '⛰️'),
+                   v('川', 'かわ', 'river', '🏞️'), v('うち', 'うち', 'home', '🏠')],
+          things: [v('しゅみ', 'しゅみ', 'a hobby', '🎨'), v('りょうり', 'りょうり', 'cooking', '🍳'),
+                   v('どくしょ', 'どくしょ', 'reading (as a hobby)', '📚'), v('つり', 'つり', 'fishing', '🎣'),
+                   v('はれ', 'はれ', 'fine weather', '☀️'), v('くもり', 'くもり', 'cloudy', '☁️')],
+          actions: [v('つくります', 'つくります', 'makes (cake / sushi)', '🍰'), v('ひきます', 'ひきます', 'plays (guitar / piano)', '🎸'),
+                    v('とります', 'とります', 'takes (a photo)', '📷'), v('かきます', 'かきます', 'draws (a picture)', '✏️'),
+                    v('うたいます', 'うたいます', 'sings (a song)', '🎤'), v('さんぽを します', 'さんぽを します', 'has a walk', '🚶')],
+          /* All four are stored as the plain i-adjective past form, since
+           * "{きもち}です" appends です straight after - correct for an
+           * i-adjective (たのしかった + です), but a na-adjective like
+           * たいへん would need でした instead of だった + です, so it's
+           * left out here rather than risk producing bad Japanese. */
+          feelings: [v('たのしかった', 'たのしかった', 'was fun', '😆'), v('よかった', 'よかった', 'was good', '👍'),
+                     v('つまらなかった', 'つまらなかった', 'was boring', '🥱'), v('いそがしかった', 'いそがしかった', 'was busy', '😅')]
+        }
+      }
     }
   ];
 
