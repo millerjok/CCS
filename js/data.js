@@ -40,6 +40,7 @@
       '{ばしょ}に 行[い]きます',
       'でも、ありません'
     ],
+    targetsEn: ['wants something', 'goes somewhere', "but it isn't there"],
     vocab: {
       people: [
         v('学生', 'がくせい', 'student', '🧑‍🎓'),
@@ -105,6 +106,7 @@
       config: {
         title: 'おなかが すきました！',
         targets: ['{もの}を 食[た]べます', '{もの}が 好[す]きです', 'とても おいしいです'],
+        targetsEn: ['eats something', 'likes something', "it's very delicious"],
         vocab: {
           people: [v('学生', 'がくせい', 'student', '🧑‍🎓'), v('先生', 'せんせい', 'teacher', '👩‍🏫'),
                    v('お母さん', 'おかあさん', 'mother', '👩'), v('犬', 'いぬ', 'dog', '🐶'),
@@ -133,6 +135,7 @@
       config: {
         title: 'しゅくだいが ありません！',
         targets: ['{もの}が あります', '{ばしょ}に 行[い]きます', 'とても むずかしいです'],
+        targetsEn: ['has something', 'goes somewhere', "it's very difficult"],
         vocab: {
           people: [v('中学生', 'ちゅうがくせい', 'junior high student', '🧑‍🎓'), v('高校生', 'こうこうせい', 'high school student', '🎒'),
                    v('先生', 'せんせい', 'teacher', '👩‍🏫'), v('友だち', 'ともだち', 'friend', '🧑‍🤝‍🧑'),
@@ -160,6 +163,7 @@
       config: {
         title: 'ひまな 土よう日',
         targets: ['{もの}が 好[す]きです', '{ばしょ}で {どうし}', 'ぜんぜん おもしろくないです'],
+        targetsEn: ['likes something', 'does something at a place', 'not interesting at all'],
         vocab: {
           people: [v('学生', 'がくせい', 'student', '🧑‍🎓'), v('友だち', 'ともだち', 'friend', '🧑‍🤝‍🧑'),
                    v('お兄さん', 'おにいさん', 'older brother', '🧒'), v('先生', 'せんせい', 'teacher', '👩‍🏫'),
@@ -198,6 +202,7 @@
       config: {
         title: 'ファームステイの けいけん',
         targets: ['{もの}を 作[つく]ります', '{ばしょ}に 住[す]んでいます', 'しごとは {きもち}です'],
+        targetsEn: ['makes / grows something', 'lives somewhere', 'the work is ___'],
         vocab: {
           people: [v('学生', 'がくせい', 'student', '🧑‍🎓'), v('ボランティア', 'ボランティア', 'volunteer', '🙋'),
                    v('農家の人', 'のうかの ひと', 'farmer', '👨‍🌾'), v('青山さん', 'あおやまさん', 'host (Aoyama-san)', '🧑‍🌾'),
@@ -230,6 +235,13 @@
           '{もの}を 買[か]う つもりです',
           '{ばしょ}に 着[つ]いたら、{どうし}',
           '{ばしょ}に いる 間[あいだ]に、{どうし}'
+        ],
+        targetsEn: [
+          'someone explained something for them',
+          'plans to go somewhere tomorrow',
+          'intends to buy something',
+          'once they arrive somewhere, ___',
+          'while they are somewhere, ___'
         ],
         vocab: {
           people: [v('家族', 'かぞく', 'family', '👪'), v('ガイド', 'ガイド', 'guide', '🗺️'),
@@ -269,6 +281,13 @@
           '休[やす]みに、ときどき {ばしょ}に 行[い]きます',
           '去年[きょねん]の 休[やす]みは {きもち}です'
         ],
+        targetsEn: [
+          'always ___ in the mornings',
+          'usually ___ on weekends',
+          'often ___ in free time',
+          'sometimes goes somewhere on holidays',
+          "last year's holiday was ___"
+        ],
         vocab: {
           people: [v('学生', 'がくせい', 'student', '🧑‍🎓'), v('友だち', 'ともだち', 'friend', '🧑‍🤝‍🧑'),
                    v('家族', 'かぞく', 'family', '👪'), v('先生', 'せんせい', 'teacher', '👩‍🏫'),
@@ -290,13 +309,17 @@
                     v('えを かきます', 'えを かきます', 'draws a picture', '✏️'),
                     v('うたを うたいます', 'うたを うたいます', 'sings a song', '🎤'),
                     v('さんぽを します', 'さんぽを します', 'has a walk', '🚶')],
-          /* All four are stored as the plain i-adjective past form, since
-           * "{きもち}です" appends です straight after - correct for an
-           * i-adjective (たのしかった + です), but a na-adjective like
+          /* The Japanese word (.w/.r) is the plain i-adjective past form,
+           * since "{きもち}です" appends です straight after - correct for
+           * an i-adjective (たのしかった + です), but a na-adjective like
            * たいへん would need でした instead of だった + です, so it's
-           * left out here rather than risk producing bad Japanese. */
-          feelings: [v('たのしかった', 'たのしかった', 'was fun', '😆'), v('よかった', 'よかった', 'was good', '👍'),
-                     v('つまらなかった', 'つまらなかった', 'was boring', '🥱'), v('いそがしかった', 'いそがしかった', 'was busy', '😅')]
+           * left out here rather than risk producing bad Japanese. The
+           * English gloss (.e) stays a bare adjective, not "was fun" etc,
+           * since narrative lines elsewhere build their own English around
+           * it ("X feels very ___") and would otherwise double up the
+           * past tense ("feels very was fun"). */
+          feelings: [v('たのしかった', 'たのしかった', 'fun', '😆'), v('よかった', 'よかった', 'good', '👍'),
+                     v('つまらなかった', 'つまらなかった', 'boring', '🥱'), v('いそがしかった', 'いそがしかった', 'busy', '😅')]
         }
       }
     }
