@@ -1016,8 +1016,8 @@
           }).concat([{ tk: tk(self.st.went), icon: D.guessIcon(self.st.went, 'places'), correct: true }]));
           self.drill([{
             type: 'wh',
-            prompt: R.parse('どこで しましたか。'),
-            en: 'Where did that happen?',
+            prompt: J('どこで ', tk(past), 'か。'),
+            en: 'Where did that happen (' + (past.e || past.w) + ')?',
             choices: placeChoices,
             echo: J(tk(self.st.went), 'で ', tk(past), '。'),
             focus: self.st.went
