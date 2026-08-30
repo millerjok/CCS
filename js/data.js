@@ -43,7 +43,7 @@
       'でも、ありません',
       '{ばしょ}で {どうし}'
     ],
-    targetsEn: ['wants something', 'goes somewhere', "but it isn't there", 'does something at a place'],
+    targetsEn: ['wants {もの}', 'goes to {ばしょ}', "but it isn't there", '{どうし} at {ばしょ}'],
     vocab: {
       people: [
         v('学生', 'がくせい', 'student', '🧑‍🎓'),
@@ -100,7 +100,7 @@
       name: 'ラーメンが ほしい！',
       en: 'Starter pack (food + town)',
       icon: '🍜',
-      rev: 3,
+      rev: 4,
       config: DEFAULT_CONFIG
     },
     {
@@ -108,13 +108,13 @@
       name: 'たべもの',
       en: 'iitomo 2 — Food & drink',
       icon: '🍱',
-      rev: 3,
+      rev: 4,
       config: {
         title: 'おなかが すきました！',
         /* 4th target added so this pack's own "Verbs" vocab actually
          * surfaces in the story - it wasn't referenced anywhere before. */
         targets: ['{もの}を 食[た]べます', '{もの}が 好[す]きです', 'とても おいしいです', '{ばしょ}で {どうし}'],
-        targetsEn: ['eats something', 'likes something', "it's very delicious", 'does something at a place'],
+        targetsEn: ['eats {もの}', 'likes {もの}', "it's very delicious", '{どうし} at {ばしょ}'],
         vocab: {
           people: [v('学生', 'がくせい', 'student', '🧑‍🎓'), v('先生', 'せんせい', 'teacher', '👩‍🏫'),
                    v('お母さん', 'おかあさん', 'mother', '👩'), v('犬', 'いぬ', 'dog', '🐶'),
@@ -142,13 +142,13 @@
       name: 'がっこう',
       en: 'iitomo 2 — School & subjects',
       icon: '🏫',
-      rev: 3,
+      rev: 4,
       config: {
         title: 'しゅくだいが ありません！',
         /* 4th target added so this pack's own "Verbs" vocab actually
          * surfaces in the story - it wasn't referenced anywhere before. */
         targets: ['{もの}が あります', '{ばしょ}に 行[い]きます', 'とても むずかしいです', '{ばしょ}で {どうし}'],
-        targetsEn: ['has something', 'goes somewhere', "it's very difficult", 'does something at a place'],
+        targetsEn: ['has {もの}', 'goes to {ばしょ}', "it's very difficult", '{どうし} at {ばしょ}'],
         vocab: {
           people: [v('中学生', 'ちゅうがくせい', 'junior high student', '🧑‍🎓'), v('高校生', 'こうこうせい', 'high school student', '🎒'),
                    v('先生', 'せんせい', 'teacher', '👩‍🏫'), v('友だち', 'ともだち', 'friend', '🧑‍🤝‍🧑'),
@@ -173,11 +173,11 @@
       name: 'しゅみ',
       en: 'iitomo 2 — Hobbies & free time',
       icon: '🎮',
-      rev: 3,
+      rev: 4,
       config: {
         title: 'ひまな 土よう日',
         targets: ['{もの}が 好[す]きです', '{ばしょ}で {どうし}', 'ぜんぜん おもしろくないです'],
-        targetsEn: ['likes something', 'does something at a place', 'not interesting at all'],
+        targetsEn: ['likes {もの}', '{どうし} at {ばしょ}', 'not interesting at all'],
         vocab: {
           people: [v('学生', 'がくせい', 'student', '🧑‍🎓'), v('友だち', 'ともだち', 'friend', '🧑‍🤝‍🧑'),
                    v('お兄さん', 'おにいさん', 'older brother', '🧒'), v('先生', 'せんせい', 'teacher', '👩‍🏫'),
@@ -223,13 +223,13 @@
       name: 'ファームステイ',
       en: 'Farm Stay Experience',
       icon: '🚜',
-      rev: 3,
+      rev: 4,
       config: {
         title: 'ファームステイの けいけん',
         /* 4th target added so this pack's own "Verbs" vocab actually
          * surfaces in the story - it wasn't referenced anywhere before. */
         targets: ['{もの}を 作[つく]ります', '{ばしょ}に 住[す]んでいます', 'しごとは {きもち}です', 'まいにち、{どうし}'],
-        targetsEn: ['makes / grows something', 'lives somewhere', 'the work is ___', 'does something every day'],
+        targetsEn: ['makes / grows {もの}', 'lives in {ばしょ}', 'the work is {きもち}', '{どうし} every day'],
         vocab: {
           people: [v('学生', 'がくせい', 'student', '🧑‍🎓'), v('ボランティア', 'ボランティア', 'volunteer', '🙋'),
                    v('農家の人', 'のうかの ひと', 'farmer', '👨‍🌾'), v('青山さん', 'あおやまさん', 'host (Aoyama-san)', '🧑‍🌾'),
@@ -262,7 +262,7 @@
       name: '広島',
       en: 'Hiroshima Trip (email home)',
       icon: '⛩️',
-      rev: 3,
+      rev: 4,
       config: {
         title: '広島への たび',
         targets: [
@@ -273,11 +273,11 @@
           '{ばしょ}に いる 間[あいだ]に、{どうし}'
         ],
         targetsEn: [
-          'someone explained something for them',
-          'plans to go somewhere tomorrow',
-          'intends to buy something',
-          'once they arrive somewhere, ___',
-          'while they are somewhere, ___'
+          '{ひと} explained about {もの}',
+          'plans to go to {ばしょ} tomorrow',
+          'intends to buy {もの}',
+          'once they arrive at {ばしょ}, {どうし}',
+          'while they are at {ばしょ}, {どうし}'
         ],
         vocab: {
           people: [v('家族', 'かぞく', 'family', '👪'), v('ガイド', 'ガイド', 'guide', '🗺️'),
@@ -308,7 +308,7 @@
       name: 'ひまな じかん',
       en: 'Free time & frequency (how often, how was your holiday)',
       icon: '🗓️',
-      rev: 2,
+      rev: 3,
       config: {
         title: '去年の 休み',
         /* あまり/ぜんぜん ~ません need real verb conjugation (ます -> ません),
@@ -324,11 +324,11 @@
           '去年[きょねん]の 休[やす]みは {きもち}です'
         ],
         targetsEn: [
-          'always ___ in the mornings',
-          'usually ___ on weekends',
-          'often ___ in free time',
-          'sometimes goes somewhere on holidays',
-          "last year's holiday was ___"
+          'always {どうし} in the mornings',
+          'usually {どうし} on weekends',
+          'often {どうし} in free time',
+          'sometimes goes to {ばしょ} on holidays',
+          "last year's holiday was {きもち}"
         ],
         vocab: {
           people: [v('学生', 'がくせい', 'student', '🧑‍🎓'), v('友だち', 'ともだち', 'friend', '🧑‍🤝‍🧑'),

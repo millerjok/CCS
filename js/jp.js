@@ -261,34 +261,57 @@
       slots: slots,
       cat: cat || null,
       /* The first slot carries the word the story just decided on; any other
-         slots are filled from the same word lists so the phrase stays whole. */
-      build: function (item) {
+         slots are filled from the same word lists so the phrase stays whole.
+         `extra` caches those other slots' picks - by slot name, as the raw
+         vocab item, not tokens - so repeated calls describing the SAME
+         fact (the narrated line, the drill prompt, the echo, the wrong
+         choice in an either/or) reuse the same word instead of each
+         independently re-rolling a fresh random pick, which used to make
+         the drill ask about a verb the class never actually heard. Pass
+         the same `extra` object into every build() call for one fact; a
+         fresh {} starts a new fact. Caching the item (not just its
+         tokens) also lets the caller read its .e field back out to build
+         an English translation that matches what was actually said. */
+      build: function (item, extra) {
         if (!slots.length) return R.parse(str);
+        extra = extra || {};
         var map = {};
         slots.forEach(function (name, i) {
-          var c = ns.data.SLOTS[name];
-          var list = (vocab && c && vocab[c]) || [];
-          if (i === 0) map[name] = item ? tk(item) : (list.length ? tk(pick(list)) : R.parse('＿＿'));
-          else map[name] = list.length ? tk(pick(list)) : R.parse('＿＿');
+          var val = (i === 0 && item) ? item : resolve(name);
+          map[name] = val ? tk(val) : R.parse('＿＿');
         });
         return fill(str, map);
+
+        function resolve(name) {
+          if (name in extra) return extra[name];
+          var c = ns.data.SLOTS[name];
+          var list = (vocab && c && vocab[c]) || [];
+          var picked = list.length ? pick(list) : null;
+          extra[name] = picked;
+          return picked;
+        }
       }
     };
   }
 
-  /* A yes/no + either-or round built straight from a target structure. */
-  function targetQuestions(target, item, pool, level) {
+  /* A yes/no + either-or round built straight from a target structure.
+   * `extra` (from Story.targetLine, the same object the narrated SAY line
+   * was built with) keeps every build() call below - prompt, echo, the
+   * wrong choice - describing the exact fact the class just heard, not
+   * each rolling its own random secondary-slot word. */
+  function targetQuestions(target, item, pool, level, extra) {
     var out = [], wrong;
+    extra = extra || {};
     if (!target.cat || !item) {
       out.push({
         type: 'yn',
-        prompt: J(target.build(null), 'か。'),
+        prompt: J(target.build(null, extra), 'か。'),
         en: 'Repeat after me!',
         choices: [
           { tk: R.parse('はい、そうです'), icon: '⭕', correct: true },
           { tk: R.parse('いいえ、ちがいます'), icon: '❌', correct: false }
         ],
-        echo: target.build(null),
+        echo: target.build(null, extra),
         focus: item || null,
         target: true
       });
@@ -297,13 +320,13 @@
 
     out.push({
       type: 'yn',
-      prompt: J(target.build(item), 'か。'),
+      prompt: J(target.build(item, extra), 'か。'),
       en: 'True or not?',
       choices: [
         { tk: R.parse('はい、そうです'), icon: '⭕', correct: true },
         { tk: R.parse('いいえ、ちがいます'), icon: '❌', correct: false }
       ],
-      echo: target.build(item),
+      echo: target.build(item, extra),
       focus: item,
       target: true
     });
@@ -312,13 +335,13 @@
     if (wrong && level !== 'light' && level !== 'minimal') {
       out.push({
         type: 'either',
-        prompt: J(target.build(item), 'か、', target.build(wrong), 'か。'),
+        prompt: J(target.build(item, extra), 'か、', target.build(wrong, extra), 'か。'),
         en: 'Which one is our story?',
         choices: shuffle([
-          { tk: target.build(item), icon: ns.data.guessIcon(item, target.cat), correct: true },
-          { tk: target.build(wrong), icon: ns.data.guessIcon(wrong, target.cat), correct: false }
+          { tk: target.build(item, extra), icon: ns.data.guessIcon(item, target.cat), correct: true },
+          { tk: target.build(wrong, extra), icon: ns.data.guessIcon(wrong, target.cat), correct: false }
         ]),
-        echo: target.build(item),
+        echo: target.build(item, extra),
         focus: item,
         target: true
       });

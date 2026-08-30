@@ -641,7 +641,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       'でも、ありません',
       '{ばしょ}で {どうし}'
     ],
-    targetsEn: ['wants something', 'goes somewhere', "but it isn't there", 'does something at a place'],
+    targetsEn: ['wants {もの}', 'goes to {ばしょ}', "but it isn't there", '{どうし} at {ばしょ}'],
     vocab: {
       people: [
         v('学生', 'がくせい', 'student', '🧑‍🎓'),
@@ -698,7 +698,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       name: 'ラーメンが ほしい！',
       en: 'Starter pack (food + town)',
       icon: '🍜',
-      rev: 3,
+      rev: 4,
       config: DEFAULT_CONFIG
     },
     {
@@ -706,13 +706,13 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       name: 'たべもの',
       en: 'iitomo 2 — Food & drink',
       icon: '🍱',
-      rev: 3,
+      rev: 4,
       config: {
         title: 'おなかが すきました！',
         /* 4th target added so this pack's own "Verbs" vocab actually
          * surfaces in the story - it wasn't referenced anywhere before. */
         targets: ['{もの}を 食[た]べます', '{もの}が 好[す]きです', 'とても おいしいです', '{ばしょ}で {どうし}'],
-        targetsEn: ['eats something', 'likes something', "it's very delicious", 'does something at a place'],
+        targetsEn: ['eats {もの}', 'likes {もの}', "it's very delicious", '{どうし} at {ばしょ}'],
         vocab: {
           people: [v('学生', 'がくせい', 'student', '🧑‍🎓'), v('先生', 'せんせい', 'teacher', '👩‍🏫'),
                    v('お母さん', 'おかあさん', 'mother', '👩'), v('犬', 'いぬ', 'dog', '🐶'),
@@ -740,13 +740,13 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       name: 'がっこう',
       en: 'iitomo 2 — School & subjects',
       icon: '🏫',
-      rev: 3,
+      rev: 4,
       config: {
         title: 'しゅくだいが ありません！',
         /* 4th target added so this pack's own "Verbs" vocab actually
          * surfaces in the story - it wasn't referenced anywhere before. */
         targets: ['{もの}が あります', '{ばしょ}に 行[い]きます', 'とても むずかしいです', '{ばしょ}で {どうし}'],
-        targetsEn: ['has something', 'goes somewhere', "it's very difficult", 'does something at a place'],
+        targetsEn: ['has {もの}', 'goes to {ばしょ}', "it's very difficult", '{どうし} at {ばしょ}'],
         vocab: {
           people: [v('中学生', 'ちゅうがくせい', 'junior high student', '🧑‍🎓'), v('高校生', 'こうこうせい', 'high school student', '🎒'),
                    v('先生', 'せんせい', 'teacher', '👩‍🏫'), v('友だち', 'ともだち', 'friend', '🧑‍🤝‍🧑'),
@@ -771,11 +771,11 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       name: 'しゅみ',
       en: 'iitomo 2 — Hobbies & free time',
       icon: '🎮',
-      rev: 3,
+      rev: 4,
       config: {
         title: 'ひまな 土よう日',
         targets: ['{もの}が 好[す]きです', '{ばしょ}で {どうし}', 'ぜんぜん おもしろくないです'],
-        targetsEn: ['likes something', 'does something at a place', 'not interesting at all'],
+        targetsEn: ['likes {もの}', '{どうし} at {ばしょ}', 'not interesting at all'],
         vocab: {
           people: [v('学生', 'がくせい', 'student', '🧑‍🎓'), v('友だち', 'ともだち', 'friend', '🧑‍🤝‍🧑'),
                    v('お兄さん', 'おにいさん', 'older brother', '🧒'), v('先生', 'せんせい', 'teacher', '👩‍🏫'),
@@ -821,13 +821,13 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       name: 'ファームステイ',
       en: 'Farm Stay Experience',
       icon: '🚜',
-      rev: 3,
+      rev: 4,
       config: {
         title: 'ファームステイの けいけん',
         /* 4th target added so this pack's own "Verbs" vocab actually
          * surfaces in the story - it wasn't referenced anywhere before. */
         targets: ['{もの}を 作[つく]ります', '{ばしょ}に 住[す]んでいます', 'しごとは {きもち}です', 'まいにち、{どうし}'],
-        targetsEn: ['makes / grows something', 'lives somewhere', 'the work is ___', 'does something every day'],
+        targetsEn: ['makes / grows {もの}', 'lives in {ばしょ}', 'the work is {きもち}', '{どうし} every day'],
         vocab: {
           people: [v('学生', 'がくせい', 'student', '🧑‍🎓'), v('ボランティア', 'ボランティア', 'volunteer', '🙋'),
                    v('農家の人', 'のうかの ひと', 'farmer', '👨‍🌾'), v('青山さん', 'あおやまさん', 'host (Aoyama-san)', '🧑‍🌾'),
@@ -860,7 +860,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       name: '広島',
       en: 'Hiroshima Trip (email home)',
       icon: '⛩️',
-      rev: 3,
+      rev: 4,
       config: {
         title: '広島への たび',
         targets: [
@@ -871,11 +871,11 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
           '{ばしょ}に いる 間[あいだ]に、{どうし}'
         ],
         targetsEn: [
-          'someone explained something for them',
-          'plans to go somewhere tomorrow',
-          'intends to buy something',
-          'once they arrive somewhere, ___',
-          'while they are somewhere, ___'
+          '{ひと} explained about {もの}',
+          'plans to go to {ばしょ} tomorrow',
+          'intends to buy {もの}',
+          'once they arrive at {ばしょ}, {どうし}',
+          'while they are at {ばしょ}, {どうし}'
         ],
         vocab: {
           people: [v('家族', 'かぞく', 'family', '👪'), v('ガイド', 'ガイド', 'guide', '🗺️'),
@@ -906,7 +906,7 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       name: 'ひまな じかん',
       en: 'Free time & frequency (how often, how was your holiday)',
       icon: '🗓️',
-      rev: 2,
+      rev: 3,
       config: {
         title: '去年の 休み',
         /* あまり/ぜんぜん ~ません need real verb conjugation (ます -> ません),
@@ -922,11 +922,11 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
           '去年[きょねん]の 休[やす]みは {きもち}です'
         ],
         targetsEn: [
-          'always ___ in the mornings',
-          'usually ___ on weekends',
-          'often ___ in free time',
-          'sometimes goes somewhere on holidays',
-          "last year's holiday was ___"
+          'always {どうし} in the mornings',
+          'usually {どうし} on weekends',
+          'often {どうし} in free time',
+          'sometimes goes to {ばしょ} on holidays',
+          "last year's holiday was {きもち}"
         ],
         vocab: {
           people: [v('学生', 'がくせい', 'student', '🧑‍🎓'), v('友だち', 'ともだち', 'friend', '🧑‍🤝‍🧑'),
@@ -1513,34 +1513,57 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
       slots: slots,
       cat: cat || null,
       /* The first slot carries the word the story just decided on; any other
-         slots are filled from the same word lists so the phrase stays whole. */
-      build: function (item) {
+         slots are filled from the same word lists so the phrase stays whole.
+         `extra` caches those other slots' picks - by slot name, as the raw
+         vocab item, not tokens - so repeated calls describing the SAME
+         fact (the narrated line, the drill prompt, the echo, the wrong
+         choice in an either/or) reuse the same word instead of each
+         independently re-rolling a fresh random pick, which used to make
+         the drill ask about a verb the class never actually heard. Pass
+         the same `extra` object into every build() call for one fact; a
+         fresh {} starts a new fact. Caching the item (not just its
+         tokens) also lets the caller read its .e field back out to build
+         an English translation that matches what was actually said. */
+      build: function (item, extra) {
         if (!slots.length) return R.parse(str);
+        extra = extra || {};
         var map = {};
         slots.forEach(function (name, i) {
-          var c = ns.data.SLOTS[name];
-          var list = (vocab && c && vocab[c]) || [];
-          if (i === 0) map[name] = item ? tk(item) : (list.length ? tk(pick(list)) : R.parse('＿＿'));
-          else map[name] = list.length ? tk(pick(list)) : R.parse('＿＿');
+          var val = (i === 0 && item) ? item : resolve(name);
+          map[name] = val ? tk(val) : R.parse('＿＿');
         });
         return fill(str, map);
+
+        function resolve(name) {
+          if (name in extra) return extra[name];
+          var c = ns.data.SLOTS[name];
+          var list = (vocab && c && vocab[c]) || [];
+          var picked = list.length ? pick(list) : null;
+          extra[name] = picked;
+          return picked;
+        }
       }
     };
   }
 
-  /* A yes/no + either-or round built straight from a target structure. */
-  function targetQuestions(target, item, pool, level) {
+  /* A yes/no + either-or round built straight from a target structure.
+   * `extra` (from Story.targetLine, the same object the narrated SAY line
+   * was built with) keeps every build() call below - prompt, echo, the
+   * wrong choice - describing the exact fact the class just heard, not
+   * each rolling its own random secondary-slot word. */
+  function targetQuestions(target, item, pool, level, extra) {
     var out = [], wrong;
+    extra = extra || {};
     if (!target.cat || !item) {
       out.push({
         type: 'yn',
-        prompt: J(target.build(null), 'か。'),
+        prompt: J(target.build(null, extra), 'か。'),
         en: 'Repeat after me!',
         choices: [
           { tk: R.parse('はい、そうです'), icon: '⭕', correct: true },
           { tk: R.parse('いいえ、ちがいます'), icon: '❌', correct: false }
         ],
-        echo: target.build(null),
+        echo: target.build(null, extra),
         focus: item || null,
         target: true
       });
@@ -1549,13 +1572,13 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
 
     out.push({
       type: 'yn',
-      prompt: J(target.build(item), 'か。'),
+      prompt: J(target.build(item, extra), 'か。'),
       en: 'True or not?',
       choices: [
         { tk: R.parse('はい、そうです'), icon: '⭕', correct: true },
         { tk: R.parse('いいえ、ちがいます'), icon: '❌', correct: false }
       ],
-      echo: target.build(item),
+      echo: target.build(item, extra),
       focus: item,
       target: true
     });
@@ -1564,13 +1587,13 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
     if (wrong && level !== 'light' && level !== 'minimal') {
       out.push({
         type: 'either',
-        prompt: J(target.build(item), 'か、', target.build(wrong), 'か。'),
+        prompt: J(target.build(item, extra), 'か、', target.build(wrong, extra), 'か。'),
         en: 'Which one is our story?',
         choices: shuffle([
-          { tk: target.build(item), icon: ns.data.guessIcon(item, target.cat), correct: true },
-          { tk: target.build(wrong), icon: ns.data.guessIcon(wrong, target.cat), correct: false }
+          { tk: target.build(item, extra), icon: ns.data.guessIcon(item, target.cat), correct: true },
+          { tk: target.build(wrong, extra), icon: ns.data.guessIcon(wrong, target.cat), correct: false }
         ]),
-        echo: target.build(item),
+        echo: target.build(item, extra),
         focus: item,
         target: true
       });
@@ -2212,19 +2235,38 @@ body.en-off .line-en, body.en-off .opt-en, body.en-off .q-en { display: none; }
   Story.prototype.targetLine = function (index, item) {
     var t = this.targets[index];
     if (!t) return null;
-    if (!t.cat) return { target: t, item: null, tokens: R.tag(t.build(null), 'ts') };
+    var extra = {};
+    if (!t.cat) return { target: t, item: null, extra: extra, tokens: R.tag(t.build(null, extra), 'ts') };
     var pool = this.pool(t.cat);
     var fits = item && pool.some(function (x) { return x.w === item.w; });
     var chosen = fits ? item : (JP.pick(pool) || null);
-    return { target: t, item: chosen, tokens: R.tag(t.build(chosen), 'ts') };
+    return { target: t, item: chosen, extra: extra, tokens: R.tag(t.build(chosen, extra), 'ts') };
+  };
+
+  /* targetsEn is a template using the same {slot} names as the Japanese
+   * template, filled from the real words used - line.item for the
+   * primary slot, line.extra for any other - so the English actually
+   * describes the sentence the class just heard, not a generic
+   * description of the grammar pattern regardless of which words landed
+   * in it. A template with no {slots} (a fully fixed line) is returned
+   * as-is. */
+  Story.prototype.targetEnglish = function (index, line) {
+    var tmpl = this.cfg.targetsEn && this.cfg.targetsEn[index];
+    if (!tmpl) return '';
+    var primarySlot = line.target.slot;
+    return tmpl.replace(/\{([^}]+)\}/g, function (_, name) {
+      name = name.trim();
+      var val = (name === primarySlot) ? line.item : line.extra[name];
+      return val ? (val.e || val.w) : 'something';
+    });
   };
 
   Story.prototype.speakTarget = function (index, item, mood) {
     var line = this.targetLine(index, item);
     if (!line) return;
-    this.say(J(line.tokens, '！'), (this.cfg.targetsEn && this.cfg.targetsEn[index]) || '',
+    this.say(J(line.tokens, '！'), this.targetEnglish(index, line),
       { who: 'hero', mood: mood || this.st.mood, target: true, icon: line.item ? D.guessIcon(line.item, line.target.cat) : '' });
-    this.drill(JP.targetQuestions(line.target, line.item, this.pool(line.target.cat), this.level), 'ターゲット');
+    this.drill(JP.targetQuestions(line.target, line.item, this.pool(line.target.cat), this.level, line.extra), 'ターゲット');
   };
 
   /* ---------- beats ---------- */

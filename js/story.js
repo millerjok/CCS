@@ -155,19 +155,38 @@
   Story.prototype.targetLine = function (index, item) {
     var t = this.targets[index];
     if (!t) return null;
-    if (!t.cat) return { target: t, item: null, tokens: R.tag(t.build(null), 'ts') };
+    var extra = {};
+    if (!t.cat) return { target: t, item: null, extra: extra, tokens: R.tag(t.build(null, extra), 'ts') };
     var pool = this.pool(t.cat);
     var fits = item && pool.some(function (x) { return x.w === item.w; });
     var chosen = fits ? item : (JP.pick(pool) || null);
-    return { target: t, item: chosen, tokens: R.tag(t.build(chosen), 'ts') };
+    return { target: t, item: chosen, extra: extra, tokens: R.tag(t.build(chosen, extra), 'ts') };
+  };
+
+  /* targetsEn is a template using the same {slot} names as the Japanese
+   * template, filled from the real words used - line.item for the
+   * primary slot, line.extra for any other - so the English actually
+   * describes the sentence the class just heard, not a generic
+   * description of the grammar pattern regardless of which words landed
+   * in it. A template with no {slots} (a fully fixed line) is returned
+   * as-is. */
+  Story.prototype.targetEnglish = function (index, line) {
+    var tmpl = this.cfg.targetsEn && this.cfg.targetsEn[index];
+    if (!tmpl) return '';
+    var primarySlot = line.target.slot;
+    return tmpl.replace(/\{([^}]+)\}/g, function (_, name) {
+      name = name.trim();
+      var val = (name === primarySlot) ? line.item : line.extra[name];
+      return val ? (val.e || val.w) : 'something';
+    });
   };
 
   Story.prototype.speakTarget = function (index, item, mood) {
     var line = this.targetLine(index, item);
     if (!line) return;
-    this.say(J(line.tokens, '！'), (this.cfg.targetsEn && this.cfg.targetsEn[index]) || '',
+    this.say(J(line.tokens, '！'), this.targetEnglish(index, line),
       { who: 'hero', mood: mood || this.st.mood, target: true, icon: line.item ? D.guessIcon(line.item, line.target.cat) : '' });
-    this.drill(JP.targetQuestions(line.target, line.item, this.pool(line.target.cat), this.level), 'ターゲット');
+    this.drill(JP.targetQuestions(line.target, line.item, this.pool(line.target.cat), this.level, line.extra), 'ターゲット');
   };
 
   /* ---------- beats ---------- */
