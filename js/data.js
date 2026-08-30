@@ -35,12 +35,15 @@
   /* ---------- Default pack: works straight out of the box ---------- */
   var DEFAULT_CONFIG = {
     title: 'ラーメンが ほしい！',
+    /* 4th target added so this pack's own "Verbs" vocab actually
+     * surfaces in the story - it wasn't referenced anywhere before. */
     targets: [
       '{もの}が ほしいです',
       '{ばしょ}に 行[い]きます',
-      'でも、ありません'
+      'でも、ありません',
+      '{ばしょ}で {どうし}'
     ],
-    targetsEn: ['wants something', 'goes somewhere', "but it isn't there"],
+    targetsEn: ['wants something', 'goes somewhere', "but it isn't there", 'does something at a place'],
     vocab: {
       people: [
         v('学生', 'がくせい', 'student', '🧑‍🎓'),
@@ -66,11 +69,14 @@
         v('ゲーム', 'ゲーム', 'video game', '🎮'),
         v('本', 'ほん', 'book', '📖')
       ],
+      /* The new "{ばしょ}で {どうし}" target fills the verb bare, with no
+       * object anywhere else in the sentence, so every entry needs its
+       * own object to read as a complete sentence. */
       actions: [
-        v('食べます', 'たべます', 'eats', '🍴'),
-        v('飲みます', 'のみます', 'drinks', '🥤'),
-        v('買います', 'かいます', 'buys', '🛒'),
-        v('見ます', 'みます', 'watches', '👀')
+        v('ケーキを 食べます', 'ケーキを たべます', 'eats cake', '🍴'),
+        v('お茶を 飲みます', 'おちゃを のみます', 'drinks tea', '🥤'),
+        v('ゲームを 買います', 'ゲームを かいます', 'buys a video game', '🛒'),
+        v('テレビを 見ます', 'テレビを みます', 'watches TV', '👀')
       ],
       feelings: [
         v('うれしい', 'うれしい', 'happy', '😄', true),
@@ -94,7 +100,7 @@
       name: 'ラーメンが ほしい！',
       en: 'Starter pack (food + town)',
       icon: '🍜',
-      rev: 2,
+      rev: 3,
       config: DEFAULT_CONFIG
     },
     {
@@ -102,11 +108,13 @@
       name: 'たべもの',
       en: 'iitomo 2 — Food & drink',
       icon: '🍱',
-      rev: 2,
+      rev: 3,
       config: {
         title: 'おなかが すきました！',
-        targets: ['{もの}を 食[た]べます', '{もの}が 好[す]きです', 'とても おいしいです'],
-        targetsEn: ['eats something', 'likes something', "it's very delicious"],
+        /* 4th target added so this pack's own "Verbs" vocab actually
+         * surfaces in the story - it wasn't referenced anywhere before. */
+        targets: ['{もの}を 食[た]べます', '{もの}が 好[す]きです', 'とても おいしいです', '{ばしょ}で {どうし}'],
+        targetsEn: ['eats something', 'likes something', "it's very delicious", 'does something at a place'],
         vocab: {
           people: [v('学生', 'がくせい', 'student', '🧑‍🎓'), v('先生', 'せんせい', 'teacher', '👩‍🏫'),
                    v('お母さん', 'おかあさん', 'mother', '👩'), v('犬', 'いぬ', 'dog', '🐶'),
@@ -119,8 +127,11 @@
                    v('肉', 'にく', 'meat', '🍖'), v('魚', 'さかな', 'fish', '🐟'),
                    v('野菜', 'やさい', 'vegetables', '🥦'), v('果物', 'くだもの', 'fruit', '🍎'),
                    v('お茶', 'おちゃ', 'tea', '🍵'), v('牛乳', 'ぎゅうにゅう', 'milk', '🥛')],
-          actions: [v('食べます', 'たべます', 'eats', '🍴'), v('飲みます', 'のみます', 'drinks', '🥤'),
-                    v('買います', 'かいます', 'buys', '🛒'), v('作ります', 'つくります', 'makes', '👨‍🍳')],
+          /* The new "{ばしょ}で {どうし}" target fills the verb bare, with
+           * no object anywhere else in the sentence, so every entry needs
+           * its own object - matched to this pack's own food vocab. */
+          actions: [v('パンを 食べます', 'パンを たべます', 'eats bread', '🍴'), v('お茶を 飲みます', 'おちゃを のみます', 'drinks tea', '🥤'),
+                    v('果物を 買います', 'くだものを かいます', 'buys fruit', '🛒'), v('晩ごはんを 作ります', 'ばんごはんを つくります', 'makes dinner', '👨‍🍳')],
           feelings: [v('おいしい', 'おいしい', 'delicious', '😋'), v('うれしい', 'うれしい', 'happy', '😄', true),
                      v('かなしい', 'かなしい', 'sad', '😢', true), v('たいへん', 'たいへん', 'in trouble', '😱')]
         }
