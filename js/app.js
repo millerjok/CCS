@@ -11,7 +11,7 @@
 
   var config = null;
   var story = null;
-  var ui = { script: 'furi', english: true, level: 'minimal', big: false, autoSpeak: true, preset: null, skeleton: 'classic' };
+  var ui = { script: 'furi', english: true, level: 'minimal', big: false, autoSpeak: true, preset: null, skeleton: 'classic', scenes: 1 };
   var lastScene = null;
 
   function $(sel, root) { return (root || document).querySelector(sel); }
@@ -159,6 +159,11 @@
       };
       skelBox.appendChild(sb);
     });
+    /* Scene count only affects classic's own "tries and fails" loop -
+     * hidden for the other three shapes, which have their own fixed
+     * beat sequence and ignore it. */
+    $('#scenes-row').style.display = ui.skeleton === 'classic' ? '' : 'none';
+    $('#scenes').value = String(ui.scenes);
 
     $('#title').value = config.title || '';
 
@@ -381,7 +386,7 @@
     if (problems) { window.alert(problems); return; }
     config.title = $('#title').value || config.title;
     saveConfig();
-    story = new ns.Story(config, { circling: ui.level, skeleton: ui.skeleton });
+    story = new ns.Story(config, { circling: ui.level, skeleton: ui.skeleton, scenes: ui.scenes });
     lastScene = null;
     show('play');
     step(story.advance());
@@ -390,11 +395,15 @@
   function validate() {
     var need = [];
     var minPeople = ui.skeleton === 'mystery' ? 4 : 3; /* hero + 3 distinct suspects */
+    /* classic visits one place per scene plus the character's home, all
+     * distinct - so a 3-scene story needs 4 places, not just the usual 3. */
+    var minPlaces = (ui.skeleton === 'classic') ? Math.max(3, ui.scenes + 1) : 3;
     ['people', 'places', 'things', 'feelings'].forEach(function (k) {
       var n = (config.vocab[k] || []).filter(function (x) { return x.w && x.w.trim(); }).length;
-      var min = k === 'people' ? minPeople : 3;
+      var min = k === 'people' ? minPeople : (k === 'places' ? minPlaces : 3);
       if (n < min) need.push('・' + k + ' needs at least ' + min + ' words (you have ' + n + ')' +
-        (k === 'people' && min > 3 ? ' — the mystery skeleton needs one extra for a third suspect' : ''));
+        (k === 'people' && min > 3 ? ' — the mystery skeleton needs one extra for a third suspect' : '') +
+        (k === 'places' && min > 3 ? ' — ' + ui.scenes + ' scenes needs one place per scene, plus home' : ''));
     });
     if (!need.length) {
       /* drop half-finished rows so the story never shows an empty card */
@@ -824,6 +833,7 @@
     $('#brand-home').onclick = function () { audio.stop(); show('setup'); };
     $('#back-step').onclick = function () { if (story) step(story.back()); };
     $('#circling').onchange = function () { ui.level = this.value; applyUi(); };
+    $('#scenes').onchange = function () { ui.scenes = parseInt(this.value, 10); applyUi(); };
     $('#share').onclick = function () {
       var url = shareLink();
       if (!url) return;

@@ -91,14 +91,15 @@ shape. All four are built from the same machinery (decide → hear it circled
 back → move on), so switching shapes mid-lesson with the same pack is safe.
 
 **こまりごと (classic)** — the original shape. A character wants something,
-goes looking for it twice and fails both times, then someone helps.
+goes looking for it, fails, then someone helps. How many times they go
+looking (and fail) before help arrives is a Setup step 2 setting - 1 scene
+by default (fastest), or 2/3 for a longer lesson.
 
 | Beat | What happens |
 |---|---|
 | ① | A character **wants** something |
-| ② | Goes somewhere → **fails** |
-| ③ | Goes somewhere else → **fails again** |
-| ④ | Someone **helps** → resolution |
+| ② | Goes somewhere → **fails** (repeats for each scene chosen) |
+| ③ | Someone **helps** → resolution |
 
 **どちらが いい？ (compare)** — two options get introduced one at a time,
 each with a pro/con twist, then the class commits to a winner and finds out

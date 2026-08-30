@@ -13,20 +13,36 @@
 
   /* Each skeleton is a different shape for the same machinery below (say/
    * ask/drill/round/spiral/speakTarget). "classic" is the original one;
-   * see buildCompareBeat/buildJourneyBeat/buildMysteryBeat for the others. */
+   * see buildCompareBeat/buildJourneyBeat/buildMysteryBeat for the others.
+   * Classic's own beat list is built at construction time, not fixed here,
+   * since how many "tries and fails" scenes it has is now a teacher
+   * setting (1-3, see classicBeats below) rather than always 2. */
   var BEATS_BY_SKELETON = {
-    classic: ['hero', 'name', 'home', 'want', 'scene1', 'scene2', 'scene3', 'ending', 'recap'],
+    classic: ['hero', 'name', 'home', 'want', 'attempt1', 'helper', 'ending', 'recap'],
     compare: ['hero', 'name', 'optionA', 'optionB', 'decide', 'outcome', 'recap'],
     journey: ['hero', 'name', 'stop1', 'stop2', 'stop3', 'wrapup', 'recap'],
     mystery: ['hero', 'name', 'mystery', 'suspect1', 'suspect2', 'suspect3', 'accuse', 'reveal', 'recap']
   };
+
+  /* n attempt scenes (each its own go-somewhere -> obstacle -> fail loop),
+   * then the helper resolves it. Clamped to 1-3 - the UI only ever offers
+   * that range - so a bad/missing value quietly falls back to 1 rather
+   * than building something unplayable. */
+  function classicBeats(n) {
+    n = (n === 2 || n === 3) ? n : 1;
+    var beats = ['hero', 'name', 'home', 'want'];
+    for (var i = 1; i <= n; i++) beats.push('attempt' + i);
+    beats.push('helper', 'ending', 'recap');
+    return beats;
+  }
 
   function Story(config, options) {
     this.cfg = config;
     this.opt = options || {};
     this.level = this.opt.circling || 'normal';
     this.skeletonId = BEATS_BY_SKELETON[this.opt.skeleton] ? this.opt.skeleton : 'classic';
-    this.beatNames = BEATS_BY_SKELETON[this.skeletonId];
+    this.sceneCount = (this.opt.scenes === 2 || this.opt.scenes === 3) ? this.opt.scenes : 1;
+    this.beatNames = this.skeletonId === 'classic' ? classicBeats(this.sceneCount) : BEATS_BY_SKELETON[this.skeletonId];
     this.st = { script: [], reps: 0, asked: 0, correct: 0 };
     this.steps = [];
     this.i = -1;
@@ -283,12 +299,12 @@
       return;
     }
 
-    if (name === 'scene1' || name === 'scene2') {
-      this.buildAttempt(name === 'scene1' ? 1 : 2);
+    if (/^attempt\d+$/.test(name)) {
+      this.buildAttempt(parseInt(name.slice(7), 10));
       return;
     }
 
-    if (name === 'scene3') {
+    if (name === 'helper') {
       this.buildHelper();
       return;
     }
@@ -305,12 +321,16 @@
   };
 
   /* Attempt = go somewhere -> obstacle -> feel bad -> repeat the target line. */
+  /* Chapter numbering for classic, whose scene count is now 1-3 (plus the
+   * helper scene right after) rather than always exactly three. */
+  var SCENE_KANJI = ['一[いち]', '二[に]', '三[さん]', '四[よん]'];
+
   Story.prototype.buildAttempt = function (n) {
     var self = this;
     var visited = [this.st.home].concat((this.st.tries || []).map(function (t) { return t.place; }));
 
-    this.say(R.parse(n === 1 ? 'だい 一[いち]ばめん' : 'だい 二[に]ばめん'),
-      n === 1 ? 'Scene 1' : 'Scene 2', { who: 'chapter', mood: 'neutral' });
+    this.say(R.parse('だい ' + SCENE_KANJI[n - 1] + 'ばめん'),
+      'Scene ' + n, { who: 'chapter', mood: 'neutral' });
 
     this.ask({
       q: J(this.nameTk(), 'は どこに 行[い]きますか。'),
@@ -400,7 +420,8 @@
 
   Story.prototype.buildHelper = function () {
     var self = this;
-    this.say(R.parse('だい 三[さん]ばめん'), 'Scene 3', { who: 'chapter', mood: 'neutral' });
+    var n = this.sceneCount + 1;
+    this.say(R.parse('だい ' + SCENE_KANJI[n - 1] + 'ばめん'), 'Scene ' + n, { who: 'chapter', mood: 'neutral' });
     this.ask({
       q: J('だれが ', this.nameTk(), 'を てつだいますか。'),
       qEn: 'Who comes to help?',
