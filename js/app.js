@@ -426,7 +426,10 @@
     layer.innerHTML = story.st.hero
       ? art.actor(story.st.hero, step.mood, story.st.name && story.st.name.w)
       : art.mystery();
-    if (step.who === 'helper' && story.st.helper) {
+    /* Once a helper is introduced they stay on stage for the rest of the
+     * story (the ending beat still talks about them), not just for the
+     * single line announcing their arrival. */
+    if (story.st.helper) {
       layer.innerHTML += art.actor(story.st.helper, 'happy', 'helper');
     }
     host.appendChild(layer);

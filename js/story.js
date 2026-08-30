@@ -362,11 +362,14 @@
       place: tk(t.place), thing: tk(this.st.want), name: this.nameTk(), hero: tk(this.st.hero)
     }), card.en, { who: 'narrator', mood: this.st.mood, icon: card.icon, sfx: 'oops' });
 
-    /* yes/no round on the obstacle keeps the new sentence in the air */
+    /* yes/no round on the obstacle keeps the new sentence in the air -
+     * asks and echoes with the same verb (あります), rather than asking
+     * about もらいます and then answering with ありません for something
+     * the class was never actually asked to circle. */
     this.drill([{
       type: 'yn',
-      prompt: J(this.nameTk(), 'は ', tk(this.st.want), 'を もらいますか。'),
-      en: 'Does our character get it?',
+      prompt: J(this.nameTk(), 'は ', tk(this.st.want), 'が ありますか。'),
+      en: 'Does our character have it?',
       choices: [
         { tk: R.parse('はい、そうです'), icon: '⭕', correct: false },
         { tk: R.parse('いいえ、ちがいます'), icon: '❌', correct: true }
