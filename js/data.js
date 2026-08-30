@@ -131,11 +131,13 @@
       name: 'がっこう',
       en: 'iitomo 2 — School & subjects',
       icon: '🏫',
-      rev: 2,
+      rev: 3,
       config: {
         title: 'しゅくだいが ありません！',
-        targets: ['{もの}が あります', '{ばしょ}に 行[い]きます', 'とても むずかしいです'],
-        targetsEn: ['has something', 'goes somewhere', "it's very difficult"],
+        /* 4th target added so this pack's own "Verbs" vocab actually
+         * surfaces in the story - it wasn't referenced anywhere before. */
+        targets: ['{もの}が あります', '{ばしょ}に 行[い]きます', 'とても むずかしいです', '{ばしょ}で {どうし}'],
+        targetsEn: ['has something', 'goes somewhere', "it's very difficult", 'does something at a place'],
         vocab: {
           people: [v('中学生', 'ちゅうがくせい', 'junior high student', '🧑‍🎓'), v('高校生', 'こうこうせい', 'high school student', '🎒'),
                    v('先生', 'せんせい', 'teacher', '👩‍🏫'), v('友だち', 'ともだち', 'friend', '🧑‍🤝‍🧑'),
@@ -147,8 +149,9 @@
                    v('音楽', 'おんがく', 'music', '🎵'), v('りか', 'りか', 'science', '🔬'),
                    v('びじゅつ', 'びじゅつ', 'art', '🎨'), v('体いく', 'たいいく', 'PE', '⚽'),
                    v('しゅくだい', 'しゅくだい', 'homework', '📝'), v('時間わり', 'じかんわり', 'timetable', '🗓️')],
-          actions: [v('勉強します', 'べんきょうします', 'studies', '📖'), v('見ます', 'みます', 'looks at', '👀'),
-                    v('聞きます', 'ききます', 'listens', '👂'), v('そうじをします', 'そうじをします', 'cleans', '🧹')],
+          actions: [v('勉強します', 'べんきょうします', 'studies', '📖'), v('黒板を 見ます', 'こくばんを みます', 'looks at the blackboard', '👀'),
+                    v('音楽を 聞きます', 'おんがくを ききます', 'listens to music', '👂'),
+                    v('そうじをします', 'そうじをします', 'cleans', '🧹')],
           feelings: [v('たのしい', 'たのしい', 'fun', '😆'), v('むずかしい', 'むずかしい', 'difficult', '😵'),
                      v('げんき', 'げんき', 'energetic', '💪', true), v('かなしい', 'かなしい', 'sad', '😢', true)]
         }
@@ -159,7 +162,7 @@
       name: 'しゅみ',
       en: 'iitomo 2 — Hobbies & free time',
       icon: '🎮',
-      rev: 2,
+      rev: 3,
       config: {
         title: 'ひまな 土よう日',
         targets: ['{もの}が 好[す]きです', '{ばしょ}で {どうし}', 'ぜんぜん おもしろくないです'],
@@ -180,14 +183,25 @@
                    v('しゅみ', 'しゅみ', 'a hobby', '🎨'), v('りょうり', 'りょうり', 'cooking', '🍳'),
                    v('どくしょ', 'どくしょ', 'reading', '📚'), v('つり', 'つり', 'fishing', '🎣'),
                    v('しゃしん', 'しゃしん', 'a photo', '📸'), v('うた', 'うた', 'a song', '🎤')],
-          actions: [v('します', 'します', 'does', '✨'), v('見ます', 'みます', 'watches', '👀'),
-                    v('聞きます', 'ききます', 'listens to', '👂'), v('読みます', 'よみます', 'reads', '📖'),
-                    v('買います', 'かいます', 'buys', '🛒'), v('つくります', 'つくります', 'makes', '🍳'),
-                    v('ひきます', 'ひきます', 'plays (an instrument)', '🎸'),
+          /* This pack's target "{ばしょ}で {どうし}" fills the verb bare,
+           * with no object anywhere else in the sentence - a bare
+           * transitive verb (見ます, とります, かきます...) then reads as
+           * incomplete ("watches!" - watches what?). Every entry gives
+           * itself an object; あそびます stays bare since it's genuinely
+           * intransitive ("plays/has fun" needs nothing else). */
+          actions: [v('スポーツを します', 'スポーツを します', 'does sports', '✨'),
+                    v('えいがを 見ます', 'えいがを 見ます', 'watches a movie', '👀'),
+                    v('おんがくを 聞きます', 'おんがくを 聞きます', 'listens to music', '👂'),
+                    v('本を 読みます', 'ほんを よみます', 'reads a book', '📖'),
+                    v('ゲームを 買います', 'ゲームを かいます', 'buys a video game', '🛒'),
+                    v('りょうりを つくります', 'りょうりを つくります', 'cooks', '🍳'),
+                    v('ギターを ひきます', 'ギターを ひきます', 'plays the guitar', '🎸'),
                     v('あそびます', 'あそびます', 'plays / has fun', '🎈'),
-                    v('とります', 'とります', 'takes (a photo)', '📸'),
-                    v('かきます', 'かきます', 'draws', '✏️'), v('うたいます', 'うたいます', 'sings', '🎤'),
-                    v('のります', 'のります', 'rides', '🚲'), v('つかいます', 'つかいます', 'uses', '📱')],
+                    v('しゃしんを とります', 'しゃしんを とります', 'takes photos', '📸'),
+                    v('えを かきます', 'えを かきます', 'draws a picture', '✏️'),
+                    v('うたを うたいます', 'うたを うたいます', 'sings a song', '🎤'),
+                    v('じてんしゃに のります', 'じてんしゃに のります', 'rides a bicycle', '🚲'),
+                    v('けいたいでんわを つかいます', 'けいたいでんわを つかいます', 'uses a mobile phone', '📱')],
           feelings: [v('たのしい', 'たのしい', 'fun', '😆'), v('つまらない', 'つまらない', 'boring', '🥱'),
                      v('うれしい', 'うれしい', 'happy', '😄', true), v('ひま', 'ひま', 'free / not busy', '🛋️', true)]
         }
@@ -198,11 +212,13 @@
       name: 'ファームステイ',
       en: 'Farm Stay Experience',
       icon: '🚜',
-      rev: 2,
+      rev: 3,
       config: {
         title: 'ファームステイの けいけん',
-        targets: ['{もの}を 作[つく]ります', '{ばしょ}に 住[す]んでいます', 'しごとは {きもち}です'],
-        targetsEn: ['makes / grows something', 'lives somewhere', 'the work is ___'],
+        /* 4th target added so this pack's own "Verbs" vocab actually
+         * surfaces in the story - it wasn't referenced anywhere before. */
+        targets: ['{もの}を 作[つく]ります', '{ばしょ}に 住[す]んでいます', 'しごとは {きもち}です', 'まいにち、{どうし}'],
+        targetsEn: ['makes / grows something', 'lives somewhere', 'the work is ___', 'does something every day'],
         vocab: {
           people: [v('学生', 'がくせい', 'student', '🧑‍🎓'), v('ボランティア', 'ボランティア', 'volunteer', '🙋'),
                    v('農家の人', 'のうかの ひと', 'farmer', '👨‍🌾'), v('青山さん', 'あおやまさん', 'host (Aoyama-san)', '🧑‍🌾'),
@@ -213,9 +229,18 @@
           things: [v('やさい', 'やさい', 'vegetables', '🥦'), v('日本料理', 'にほんりょうり', 'Japanese food', '🍱'),
                    v('ピザ', 'ピザ', 'pizza', '🍕'), v('ビーフパイ', 'ビーフパイ', 'beef pie', '🥧'),
                    v('しごと', 'しごと', 'work', '💼'), v('けいけん', 'けいけん', 'an experience', '✨')],
-          actions: [v('住みます', 'すみます', 'lives', '🏠'), v('学びます', 'まなびます', 'learns', '📚'),
-                    v('作ります', 'つくります', 'makes / grows', '🌱'), v('はたらきます', 'はたらきます', 'works', '💪'),
-                    v('てつだいます', 'てつだいます', 'helps', '🤝')],
+          /* 住みます dropped - already the fixed verb in target #2
+           * ("{ばしょ}に 住んでいます"), so keeping it here just duplicated
+           * that rather than adding anything the class would hear. The
+           * new "まいにち、{どうし}" target fills the verb bare, so
+           * 学びます/作ります need their own object to read as complete
+           * sentences; はたらきます/てつだいます are genuinely intransitive
+           * and stay bare. */
+          actions: [v('のうぎょうを 学びます', 'のうぎょうを まなびます', 'learns farming', '📚'),
+                    v('やさいを 作ります', 'やさいを つくります', 'grows vegetables', '🌱'),
+                    v('はたらきます', 'はたらきます', 'works', '💪'),
+                    v('てつだいます', 'てつだいます', 'helps out', '🤝'),
+                    v('どうぶつの せわを します', 'どうぶつの せわを します', 'takes care of animals', '🐄')],
           feelings: [v('たいへん', 'たいへん', 'tough / hard', '😓'), v('いたい', 'いたい', 'painful', '🤕'),
                      v('すばらしい', 'すばらしい', 'wonderful', '🌟'), v('うれしい', 'うれしい', 'happy', '😄', true)]
         }
@@ -226,7 +251,7 @@
       name: '広島',
       en: 'Hiroshima Trip (email home)',
       icon: '⛩️',
-      rev: 2,
+      rev: 3,
       config: {
         title: '広島への たび',
         targets: [
@@ -253,9 +278,15 @@
           things: [v('タオル', 'タオル', 'towel', '🧺'), v('シーツ', 'シーツ', 'sheets', '🛏️'),
                    v('お好み焼き', 'おこのみやき', 'okonomiyaki', '🥞'), v('筆', 'ふで', '(calligraphy) brush', '🖌️'),
                    v('写真', 'しゃしん', 'photo', '📷'), v('おみやげ', 'おみやげ', 'souvenir', '🎁')],
-          actions: [v('説明します', 'せつめいします', 'explains', '🗣️'), v('買います', 'かいます', 'buys', '🛍️'),
-                    v('撮ります', 'とります', 'takes (a photo)', '📷'), v('始めます', 'はじめます', 'starts', '🎬'),
-                    v('話します', 'はなします', 'talks', '💬')],
+          /* This pack's たら/間に targets fill the verb bare, with no
+           * object anywhere else in the sentence, so every entry needs
+           * its own object to read as a complete sentence - matched back
+           * to the reading passage itself (書道を始める, 平和について話す). */
+          actions: [v('みちを 説明します', 'みちを せつめいします', 'explains the way', '🗣️'),
+                    v('おみやげを 買います', 'おみやげを かいます', 'buys a souvenir', '🛍️'),
+                    v('しゃしんを とります', 'しゃしんを とります', 'takes photos', '📷'),
+                    v('書道を 始めます', 'しょどうを はじめます', 'starts calligraphy', '🎬'),
+                    v('平和について 話します', 'へいわについて はなします', 'talks about peace', '💬')],
           feelings: [v('うれしい', 'うれしい', 'happy', '😄', true), v('たのしい', 'たのしい', 'fun', '😆'),
                      v('しんせつ', 'しんせつ', 'kind', '🤝', true), v('ゆうめい', 'ゆうめい', 'famous', '⭐')]
         }
@@ -391,11 +422,16 @@
    * read sensibly for all of those, not just physical objects. "far
    * away" and "boring" didn't (a souvenir isn't "far away", and calling
    * a towel "boring" is the same kind of mismatch as calling it happy). */
+  /* {opt} is always a 'things' item, and 'things' spans food, physical
+   * objects and SCHOOL SUBJECTS (英語, すう学...) depending on the pack -
+   * "expensive" and "hard to find" don't hold up for a subject ("maths is
+   * expensive" / "art is hard to find" are nonsense), so every card here
+   * needs to fit that too, not just food and objects. */
   var COMPARE_TRAITS = [
-    { id: 'expensive', icon: '💸', en: '…but it’s expensive!', ja: 'でも、{opt}は ちょっと たかいです。' },
+    { id: 'interesting', icon: '🤔', en: '…and it’s interesting!', ja: 'そして、{opt}は とても おもしろいです！' },
     { id: 'lovely', icon: '✨', en: '…and it’s lovely!', ja: 'そして、{opt}は とても すてきです！' },
     { id: 'popular', icon: '⭐', en: '…and it’s very popular!', ja: 'そして、{opt}は とても にんきです！' },
-    { id: 'rare', icon: '🦄', en: '…but it’s hard to find!', ja: 'でも、{opt}は みつけにくいです。' },
+    { id: 'amazing', icon: '🦄', en: '…it’s amazing!', ja: 'そして、{opt}は すごいです！' },
     { id: 'perfect', icon: '💯', en: '…it’s perfect!', ja: 'そして、{opt}は かんぺきです！' },
     { id: 'meh', icon: '😐', en: '…kind of so-so, though.', ja: 'でも、{opt}は ちょっと びみょうです。' }
   ];
