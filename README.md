@@ -87,7 +87,7 @@ The recap prints the whole story the class made. ぜんぶ きく reads it aloud
 
 Each shape is fixed on purpose — a rigid sequence of decisions is what makes
 the language repeat. Pick one in Setup step 2; any word pack works with any
-shape. All four are built from the same machinery (decide → hear it circled
+shape. All five are built from the same machinery (decide → hear it circled
 back → move on), so switching shapes mid-lesson with the same pack is safe.
 
 **こまりごと (classic)** — the original shape. A character wants something,
@@ -119,16 +119,24 @@ three suspects (one is secretly guilty, decided at random) and guesses
 "suspicious or not" for each — scored against who actually did it — before
 a detective makes the final accusation.
 
+**しゅうまつ (weekend)** — a straight past-tense recount: where the hero
+went on the weekend, who with, what they did there, what went wrong, how
+they dealt with it, and how it turned out, finishing on how they felt about
+the whole thing. Like compare, its grammar (past tense — 行きました, と
+行きました, ～ました, 「〜」と思いました) is built into the shape itself,
+not drawn from the word pack: it's the one shape whose beats teach a
+different tense to everything else, so it stands on its own rather than
+reciting whatever a pack's own (present-tense) targets happen to be.
+
 For classic, journey and mystery, the word pack's own target structures from
 step 3 get recited through the story — twice each across the two "attempt"
 scenes for classic, across the three stops or three suspects for the others.
 A pack can define more than 3 targets (the Hiroshima pack ships 5, one per
 grammar point); classic circles a 4th and 5th too, tied to its two "goes
 somewhere" scenes, while journey and mystery only ever circle the first 3.
-Compare ignores the word pack's own targets entirely and always uses its
-own four comparison structures instead (see above) — so a pack's own
-targets can be written without worrying about how they'd read as a
-comparison.
+Compare and weekend ignore the word pack's own targets entirely and always
+use their own built-in grammar instead (see above) — so a pack's own
+targets can be written without worrying about how they'd read in either.
 
 A mismatch between a target's slot and what a given moment in the story is
 actually about (e.g. a `{ばしょ}` target getting filled with a random place
@@ -139,12 +147,15 @@ it just becomes a bonus rep rather than a plot point.
 
 ## Target structures
 
-Each word pack ships with its own target structures — these are fixed and shown
-read-only in Setup step 3, labelled by category (e.g. `(Places)に 行きます`) rather than
-with one specific word, so a teacher can see the shape of what the class will hear
-without being able to break the grammar by accident. Switching to a different word
-pack drills different structures; picking compare as the story shape overrides them
-entirely with compare's own built-in comparison grammar (see "Story shapes" above).
+Each word pack ships with its own target structures. Setup step 3 lists every one,
+labelled by category (e.g. `(Places)に 行きます`) rather than with one specific word, so a
+teacher can see the shape of what the class will hear without being able to break the
+grammar itself by accident — but each one has a checkbox, so a teacher can leave out a
+structure the class hasn't met yet. Switching to a different word pack drills different
+structures; picking a story shape with its own built-in grammar (compare's comparisons,
+weekend's past-tense recount) shows that instead, with every checkbox locked on — that
+grammar is the reason to pick the shape, so it can't be switched off (see "Story shapes"
+above).
 
 To change what a pack drills, or add a new pack, edit `PRESETS` in `js/data.js` directly.
 Each target is a phrase with slots in curly brackets, filled from the pack's word lists.

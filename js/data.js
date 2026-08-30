@@ -422,7 +422,9 @@
     { id: 'journey', icon: '🧭', name: '３つの よてい',
       en: 'Three stops in a row, each with its own little twist' },
     { id: 'mystery', icon: '🔍', name: 'なぞの じけん',
-      en: 'Interviews three suspects, then makes an accusation' }
+      en: 'Interviews three suspects, then makes an accusation' },
+    { id: 'weekend', icon: '📅', name: 'しゅうまつ',
+      en: 'Recounts a weekend in the past tense — where, with whom, what happened, how it ended' }
   ];
 
   /* ---------- "Compare" skeleton cards ---------- */
@@ -478,6 +480,55 @@
     { icon: '👋', en: 'You bump into an old friend!', ja: '{place}で ふるい 友だちに ぐうぜん あいました！' },
     { icon: '🍬', en: 'Someone gives you a sweet.', ja: '{place}で だれかが あめを くれました。' },
     { icon: '⏰', en: 'You are running a little late.', ja: '{place}で ちょっと おくれて しまいました。' }
+  ];
+
+  /* ---------- "Weekend" skeleton cards ---------- */
+  /* All past tense, self-contained (no slots) - these are the small twist,
+   * response and outcome beats of a weekend recount. Kept slot-free so they
+   * don't need the {word}+ました conjugation gymnastics the actions vocab
+   * needs (see toPast() in story.js), unlike OBSTACLES/ENDINGS above which
+   * are present tense throughout. */
+  var WEEKEND_TWISTS = [
+    { icon: '🌧️', en: 'It started to rain.', ja: 'でも、あめが ふりました。' },
+    { icon: '😵', en: 'They got lost.', ja: 'でも、みちに まよいました。' },
+    { icon: '🚃', en: 'They missed the train.', ja: 'でも、でんしゃに のりおくれました。' },
+    { icon: '🤒', en: 'Their stomach started to hurt.', ja: 'でも、おなかが いたく なりました。' },
+    { icon: '😤', en: 'They had an argument.', ja: 'でも、けんかを しました。' },
+    { icon: '⏰', en: 'They ran out of time.', ja: 'でも、じかんが なく なりました。' }
+  ];
+
+  var WEEKEND_RESOLUTIONS = [
+    { icon: '🏠', en: 'Then, they went home.', ja: 'それから、うちに かえりました。' },
+    { icon: '🏪', en: 'Then, they rested at a convenience store.', ja: 'それから、コンビニで やすみました。' },
+    { icon: '📞', en: 'Then, they called a friend.', ja: 'それから、ともだちに でんわしました。' },
+    { icon: '🚕', en: 'Then, they took a taxi.', ja: 'それから、タクシーに のりました。' },
+    { icon: '💪', en: 'Then, they kept going anyway.', ja: 'それから、がんばって つづけました。' },
+    { icon: '😄', en: 'Then, they laughed about it.', ja: 'それから、わらいました。' }
+  ];
+
+  var WEEKEND_OUTCOMES = [
+    { id: 'fun', icon: '🎉', kind: 'happy', en: 'In the end, it turned into a fun day.',
+      ja: 'さいごに、たのしい 一日[いちにち]に なりました。' },
+    { id: 'memory', icon: '💖', kind: 'happy', en: 'In the end, it became a good memory.',
+      ja: 'さいごに、いい おもいでに なりました。' },
+    { id: 'tiring', icon: '😴', kind: 'twist', en: 'In the end, it turned into a tiring day.',
+      ja: 'さいごに、つかれた 一日[いちにち]に なりました。' },
+    { id: 'shame', icon: '😅', kind: 'twist', en: 'In the end, it was a slightly disappointing day.',
+      ja: 'さいごに、ちょっと ざんねんな 一日[いちにち]に なりました。' }
+  ];
+
+  /* Display-only shape for Setup step 3 (see templateShapeTokens in app.js) -
+   * the four real grammar points weekend drills as target reps (matching
+   * the went/withWho/activity/feeling beats in story.js, which are the only
+   * ones that mark their circling questions target:true). The obstacle/
+   * resolution/outcome beats in between are free story cards with no
+   * vocab slot of their own, same as classic's obstacle/ending cards, so
+   * they aren't listed here as a "grammar point" either. */
+  var WEEKEND_TARGETS = [
+    '{ひと}は 週末[しゅうまつ]に {ばしょ}に 行[い]きました',
+    '{ひと}と 行[い]きました',
+    'そこで {どうし}ました',
+    '「{きもち}」と 思[おも]いました'
   ];
 
   /* ---------- "Mystery" skeleton cards ---------- */
@@ -644,6 +695,10 @@
     COMPARE_TARGETS: COMPARE_TARGETS,
     JOURNEY_EVENTS: JOURNEY_EVENTS,
     MYSTERY_CLUES: MYSTERY_CLUES,
+    WEEKEND_TWISTS: WEEKEND_TWISTS,
+    WEEKEND_RESOLUTIONS: WEEKEND_RESOLUTIONS,
+    WEEKEND_OUTCOMES: WEEKEND_OUTCOMES,
+    WEEKEND_TARGETS: WEEKEND_TARGETS,
     sceneKindFor: sceneKindFor,
     guessIcon: guessIcon,
     moodFor: moodFor

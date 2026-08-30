@@ -15,7 +15,7 @@ const R = CCS.ruby;
 
 const RUNS = parseInt(process.argv[2], 10) || 40;
 const LEVELS = ['minimal', 'light', 'normal', 'heavy'];
-const SKELETONS = ['classic', 'compare', 'journey', 'mystery'];
+const SKELETONS = ['classic', 'compare', 'journey', 'mystery', 'weekend'];
 const SCENES = [1, 2, 3]; // classic only - other skeletons ignore this option
 let failures = 0, stories = 0, totalLines = 0, totalQuestions = 0, minReps = Infinity;
 
@@ -87,6 +87,30 @@ CCS.data.PRESETS.forEach(function (preset) {
       });
     });
   });
+});
+
+/* Unchecking a word pack's own target (config.targetsEnabled[i] = false)
+ * should just silently drop that line, not crash or leave a gap the class
+ * would notice - checked here for classic, the only shape whose word-pack
+ * targets get exercised across all 4-5 possible slots. */
+CCS.data.PRESETS.forEach(function (preset) {
+  var cfg = JSON.parse(JSON.stringify(preset.config));
+  cfg.targetsEnabled = (cfg.targets || []).map(function (_, i) { return i !== 0; });
+  for (let run = 0; run < 10; run++) {
+    const story = new CCS.Story(JSON.parse(JSON.stringify(cfg)), { circling: 'minimal', skeleton: 'classic' });
+    let step = story.advance(), guard = 0;
+    while (step && guard++ < 2000) {
+      if (step.kind === 'choose') {
+        const opt = step.options[Math.floor(Math.random() * step.options.length)];
+        step = story.answer(opt);
+        continue;
+      }
+      if (step.kind === 'circle') { step.questions.forEach(function () { story.score(true); }); }
+      if (step.kind === 'recap') break;
+      step = story.advance();
+    }
+    if (guard >= 2000) { console.error('  ✗ disabled-target story never finished: ' + preset.id); failures++; }
+  }
 });
 
 console.log('stories played   : ' + stories);

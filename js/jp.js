@@ -122,6 +122,61 @@
       yes:    function (x) { return J('はい、', x, 'が てつだいます。'); },
       no:     function (x) { return J('いいえ、', x, 'は てつだいません。'); },
       en:     function (s, x) { return x + ' helps ' + s + '.'; }
+    },
+    /* ---- past-tense frames, used only by the "weekend" skeleton's recount
+     * (went somewhere / with someone / did something / thought something),
+     * since every other frame above narrates in the present tense. ---- */
+    wentTo: {
+      cat: 'places', qWord: 'どこ',
+      say:    function (s, x) { return J(s, 'は ', x, 'に 行[い]きました。'); },
+      askYN:  function (s, x) { return J(s, 'は ', x, 'に 行[い]きましたか。'); },
+      askOr:  function (s, a, b) { return J(s, 'は ', a, 'に 行[い]きましたか、', b, 'に 行[い]きましたか。'); },
+      askWh:  function (s) { return J(s, 'は どこに 行[い]きましたか。'); },
+      pick:   function (x) { return J(x, 'に 行[い]きました'); },
+      yes:    function (x) { return J('はい、', x, 'に 行[い]きました。'); },
+      no:     function (x) { return J('いいえ、', x, 'には 行[い]きませんでした。'); },
+      en:     function (s, x) { return s + ' went to the ' + x + '.'; }
+    },
+    wentWith: {
+      cat: 'people', qWord: 'だれ',
+      say:    function (s, x) { return J(s, 'は ', x, 'と 行[い]きました。'); },
+      askYN:  function (s, x) { return J(s, 'は ', x, 'と 行[い]きましたか。'); },
+      askOr:  function (s, a, b) { return J(s, 'は ', a, 'と 行[い]きましたか、', b, 'と 行[い]きましたか。'); },
+      askWh:  function (s) { return J(s, 'は だれと 行[い]きましたか。'); },
+      pick:   function (x) { return J(x, 'と 行[い]きました'); },
+      yes:    function (x) { return J('はい、', x, 'と 行[い]きました。'); },
+      no:     function (x) { return J('いいえ、', x, 'とは 行[い]きませんでした。'); },
+      en:     function (s, x) { return s + ' went with ' + x + '.'; }
+    },
+    /* `x` here is already a full past-tense predicate (object+verb, e.g.
+     * "ケーキを 食べました") - see toPast() in story.js - so unlike the other
+     * frames it needs nothing appended in pick()/yes(), just the subject
+     * and place stitched on in say()/askYN(). */
+    did: {
+      cat: 'actions', qWord: 'なに',
+      say:    function (s, x) { return J(s, 'は そこで ', x, '。'); },
+      askYN:  function (s, x) { return J(s, 'は そこで ', x, 'か。'); },
+      askOr:  function (s, a, b) { return J(s, 'は そこで ', a, 'か、', b, 'か。'); },
+      askWh:  function (s) { return J(s, 'は そこで 何[なに]を しましたか。'); },
+      pick:   function (x) { return x; },
+      yes:    function (x) { return J('はい、', x); },
+      no:     function (x) { return R.parse('いいえ、ちがいます。'); },
+      en:     function (s, x) { return s + ' did this there: ' + x + '.'; }
+    },
+    /* Quoting a thought keeps the feeling word in plain/dictionary form
+     * ("「たのしい」と 思いました" = 'thought, "it was fun"'), which sidesteps
+     * needing to know whether a given feeling is an i-adjective (かった) or
+     * a na-adjective/noun (でした) past tense - only 思う itself conjugates. */
+    thought: {
+      cat: 'feelings', qWord: 'どう',
+      say:    function (s, x) { return J(s, 'は 「', x, '」と 思[おも]いました。'); },
+      askYN:  function (s, x) { return J(s, 'は 「', x, '」と 思[おも]いましたか。'); },
+      askOr:  function (s, a, b) { return J(s, 'は 「', a, '」と 思[おも]いましたか、「', b, '」と 思[おも]いましたか。'); },
+      askWh:  function (s) { return J(s, 'は どう 思[おも]いましたか。'); },
+      pick:   function (x) { return J('「', x, '」と 思[おも]いました'); },
+      yes:    function (x) { return J('はい、「', x, '」と 思[おも]いました。'); },
+      no:     function (x) { return R.parse('いいえ、ちがいます。'); },
+      en:     function (s, x) { return s + ' thought, "It was ' + x + '."'; }
     }
   };
 

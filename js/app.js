@@ -167,13 +167,26 @@
 
     $('#title').value = config.title || '';
 
-    /* target structures: normally fixed by the word pack, but a skeleton
-     * with its own grammar shape (like compare's A/B comparisons) overrides
-     * that with its own fixed set instead. */
+    /* target structures: a skeleton with its own fixed grammar shape
+     * (compare's A/B comparisons, weekend's past-tense recount) shows that
+     * instead, locked on - every beat that builds it always runs, so a
+     * teacher can't accidentally break the one grammar point the shape
+     * exists to teach. Classic/journey/mystery instead show the word
+     * pack's own targets, each individually checkable - config.targetsEnabled
+     * (default: all on) records which ones the teacher keeps. */
     var t = $('#targets');
     t.innerHTML = '';
-    var activeTargets = (ui.skeleton === 'compare') ? D.COMPARE_TARGETS : (config.targets || []);
-    activeTargets.forEach(function (tmpl, i) { t.appendChild(targetRow(i, tmpl)); });
+    var skeletonOwned = ui.skeleton === 'compare' ? D.COMPARE_TARGETS
+      : ui.skeleton === 'weekend' ? D.WEEKEND_TARGETS : null;
+    if (skeletonOwned) {
+      skeletonOwned.forEach(function (tmpl, i) { t.appendChild(targetRow(i, tmpl, { locked: true })); });
+    } else {
+      var packTargets = config.targets || [];
+      config.targetsEnabled = packTargets.map(function (_, i) {
+        return config.targetsEnabled && config.targetsEnabled[i] !== false;
+      });
+      packTargets.forEach(function (tmpl, i) { t.appendChild(targetRow(i, tmpl, { enabled: config.targetsEnabled[i] })); });
+    }
 
     renderVocab();
     $('#circling').value = ui.level;
@@ -196,14 +209,34 @@
     return out.concat(R.parse(tmpl.slice(last)));
   }
 
-  /* Target grammar is fixed per word pack, not teacher-editable — this just
-   * displays the pack's own structure. */
-  function targetRow(i, tmpl) {
+  /* The sentence shape itself is always fixed (a teacher edits the words it
+   * draws from, not the grammar) - but which structures actually get used
+   * is now a choice: `opts.locked` is a skeleton's own built-in grammar
+   * (compare, weekend), always on and shown checked+disabled; otherwise
+   * it's one of the word pack's own targets, toggled via
+   * config.targetsEnabled and checkable by the teacher. */
+  function targetRow(i, tmpl, opts) {
+    opts = opts || {};
     var wrap = el('div', 'target-row');
+    var box = el('input');
+    box.type = 'checkbox';
+    box.className = 'target-check';
+    box.checked = opts.locked ? true : !!opts.enabled;
+    box.disabled = !!opts.locked;
+    box.title = opts.locked ? "Part of this story shape's own grammar — always included" : 'Include this in the story?';
+    if (!opts.locked) {
+      box.onchange = function () {
+        config.targetsEnabled[i] = box.checked;
+        saveConfig();
+        wrap.classList.toggle('off', !box.checked);
+      };
+    }
+    wrap.appendChild(box);
     wrap.appendChild(el('div', 'idx', String(i + 1)));
     var prev = el('div', 'preview jp');
     if (tmpl) prev.innerHTML = line(templateShapeTokens(tmpl));
     wrap.appendChild(prev);
+    if (!opts.locked && opts.enabled === false) wrap.classList.add('off');
     return wrap;
   }
 
@@ -398,7 +431,7 @@
     /* classic visits one place per scene plus the character's home, all
      * distinct - so a 3-scene story needs 4 places, not just the usual 3. */
     var minPlaces = (ui.skeleton === 'classic') ? Math.max(3, ui.scenes + 1) : 3;
-    ['people', 'places', 'things', 'feelings'].forEach(function (k) {
+    ['people', 'places', 'things', 'actions', 'feelings'].forEach(function (k) {
       var n = (config.vocab[k] || []).filter(function (x) { return x.w && x.w.trim(); }).length;
       var min = k === 'people' ? minPeople : (k === 'places' ? minPlaces : 3);
       if (n < min) need.push('・' + k + ' needs at least ' + min + ' words (you have ' + n + ')' +

@@ -11,6 +11,36 @@
   var R = ns.ruby, JP = ns.jp, D = ns.data;
   var J = JP.J, tk = JP.tk;
 
+  /* Every actions-category word ships as a full ます-form predicate (see
+   * data.js's CATS hint: "Verbs (ます form)"), and ます -> past is always the
+   * regular suffix swap ます -> ました, with no irregulars - so converting
+   * any pack's own verb+object phrase to past tense is safe as a plain
+   * string replace, for every pack past, present or future. English past
+   * tense is not nearly so regular (eats -> ate, buys -> bought), so it's
+   * a lookup instead, covering every gloss the built-in packs ship; a gloss
+   * that isn't in the table is left as-is rather than guessed wrong. */
+  var PAST_EN = {
+    'eats cake': 'ate cake', 'drinks tea': 'drank tea', 'buys a video game': 'bought a video game',
+    'watches TV': 'watched TV', 'eats bread': 'ate bread', 'makes dinner': 'made dinner',
+    'buys fruit': 'bought fruit', 'studies': 'studied', 'looks at the blackboard': 'looked at the blackboard',
+    'listens to music': 'listened to music', 'cleans': 'cleaned', 'does sports': 'did sports',
+    'watches a movie': 'watched a movie', 'reads a book': 'read a book', 'cooks': 'cooked',
+    'plays the guitar': 'played the guitar', 'plays / has fun': 'played / had fun',
+    'takes photos': 'took photos', 'draws a picture': 'drew a picture', 'sings a song': 'sang a song',
+    'rides a bicycle': 'rode a bicycle', 'uses a mobile phone': 'used a mobile phone',
+    'learns farming': 'learned farming', 'grows vegetables': 'grew vegetables', 'works': 'worked',
+    'helps out': 'helped out', 'takes care of animals': 'took care of animals',
+    'explains the way': 'explained the way', 'buys a souvenir': 'bought a souvenir',
+    'starts calligraphy': 'started calligraphy', 'talks about peace': 'talked about peace',
+    'makes a cake': 'made a cake', 'has a walk': 'had a walk'
+  };
+
+  function toPast(item) {
+    if (!item) return item;
+    function conv(s) { return s ? s.replace(/ます$/, 'ました') : s; }
+    return { w: conv(item.w), r: conv(item.r), e: PAST_EN[item.e] || item.e, icon: item.icon };
+  }
+
   /* Each skeleton is a different shape for the same machinery below (say/
    * ask/drill/round/spiral/speakTarget). "classic" is the original one;
    * see buildCompareBeat/buildJourneyBeat/buildMysteryBeat for the others.
@@ -21,7 +51,8 @@
     classic: ['hero', 'name', 'home', 'want', 'attempt1', 'helper', 'ending', 'recap'],
     compare: ['hero', 'name', 'optionA', 'optionB', 'decide', 'outcome', 'recap'],
     journey: ['hero', 'name', 'stop1', 'stop2', 'stop3', 'wrapup', 'recap'],
-    mystery: ['hero', 'name', 'mystery', 'suspect1', 'suspect2', 'suspect3', 'accuse', 'reveal', 'recap']
+    mystery: ['hero', 'name', 'mystery', 'suspect1', 'suspect2', 'suspect3', 'accuse', 'reveal', 'recap'],
+    weekend: ['hero', 'name', 'went', 'withWho', 'activity', 'obstacle', 'resolution', 'outcome', 'feeling', 'recap']
   };
 
   /* n attempt scenes (each its own go-somewhere -> obstacle -> fail loop),
@@ -138,12 +169,33 @@
     return step;
   };
 
-  /* Circling round for a fact, plus one spiral question about an older fact. */
-  Story.prototype.round = function (frame, subject, subjectEn, item, cat, label, poolOverride) {
+  /* Circling round for a fact, plus one spiral question about an older
+   * fact. `asTarget` marks the (non-spiral) questions as the lesson's own
+   * target grammar - counted in the "🔁 ターゲット" rep meter - for skeletons
+   * like weekend whose beats *are* the target grammar, rather than a
+   * separate speakTarget() call reciting the word pack's own structures. */
+  Story.prototype.round = function (frame, subject, subjectEn, item, cat, label, poolOverride, asTarget) {
     var qs = JP.circle({
       frame: frame, subject: subject, subjectEn: subjectEn,
       item: item, pool: poolOverride || this.pool(cat), level: this.level
     });
+    if (asTarget) qs.forEach(function (q) { q.target = true; });
+    var spiral = this.level === 'minimal' ? null : this.spiral();
+    if (spiral) qs = qs.concat(spiral);
+    return this.drill(qs, label);
+  };
+
+  /* Same as round() above, but converts the item and its whole distractor
+   * pool through `convertFn` first - for the "weekend" skeleton's activity
+   * beat, where the vocab item itself needs conjugating (ます -> ました) to
+   * match the frame's past tense, not just narrating with a fixed verb. */
+  Story.prototype.roundConverted = function (frame, subject, subjectEn, item, cat, label, convertFn, asTarget) {
+    var pool = this.pool(cat).map(convertFn);
+    var qs = JP.circle({
+      frame: frame, subject: subject, subjectEn: subjectEn,
+      item: convertFn(item), pool: pool, level: this.level
+    });
+    if (asTarget) qs.forEach(function (q) { q.target = true; });
     var spiral = this.level === 'minimal' ? null : this.spiral();
     if (spiral) qs = qs.concat(spiral);
     return this.drill(qs, label);
@@ -197,7 +249,14 @@
     });
   };
 
+  /* A teacher can uncheck one of the word pack's own target grammar points
+   * in Setup step 3 (config.targetsEnabled[i] === false) - every call site
+   * that recites a pack target funnels through here or speakCompareTarget,
+   * so unchecking one just silently drops that line and its drill rather
+   * than needing every beat that calls speakTarget to check for itself.
+   * Absent targetsEnabled (older saved configs) means everything is on. */
   Story.prototype.speakTarget = function (index, item, mood) {
+    if (this.cfg.targetsEnabled && this.cfg.targetsEnabled[index] === false) return;
     var line = this.targetLine(index, item);
     if (!line) return;
     this.say(J(line.tokens, '！'), this.targetEnglish(index, line),
@@ -210,6 +269,7 @@
     if (this.skeletonId === 'compare') return this.buildCompareBeat(name);
     if (this.skeletonId === 'journey') return this.buildJourneyBeat(name);
     if (this.skeletonId === 'mystery') return this.buildMysteryBeat(name);
+    if (this.skeletonId === 'weekend') return this.buildWeekendBeat(name);
     return this.buildClassicBeat(name);
   };
 
@@ -874,6 +934,211 @@
 
     if (name === 'recap') {
       this.steps.push({ kind: 'recap', scene: this.scene(), mood: 'excited', props: this.props() });
+      return;
+    }
+  };
+
+  /* ================= "Weekend" skeleton =================
+   * A straight past-tense recount: went somewhere, with someone, did
+   * something there, something went wrong, they dealt with it, and how it
+   * turned out - finishing on how the hero felt about the whole thing.
+   * Unlike classic/journey/mystery, weekend never touches the word pack's
+   * own config.targets - like compare, its grammar (the past-tense frames
+   * in jp.js) is the whole point of the shape, not a slot a pack fills in.
+   */
+  Story.prototype.buildWeekendBeat = function (name) {
+    var self = this;
+    if (name === 'hero' || name === 'name') return this.buildClassicBeat(name);
+
+    if (name === 'went') {
+      this.st.scene = 'town';
+      this.ask({
+        q: J(this.nameTk(), 'は 週末[しゅうまつ]に どこに 行[い]きましたか。'),
+        qEn: 'Where did ' + this.nameEn() + ' go on the weekend?',
+        options: this.options('places', 4).map(function (it) {
+          return { item: it, icon: D.guessIcon(it, 'places'), tk: tk(it), en: it.e };
+        }),
+        onPick: function (opt) {
+          self.st.went = opt.item;
+          self.st.scene = D.sceneKindFor(opt.item);
+          self.st.mood = 'happy';
+          self.say(J(self.nameTk(), 'は 週末[しゅうまつ]に ', tk(opt.item), 'に 行[い]きました。'),
+            self.nameEn() + ' went to the ' + (opt.item.e || opt.item.w) + ' on the weekend.',
+            { who: 'narrator', scene: self.st.scene, icon: opt.icon, sfx: 'flip' });
+          self.round('wentTo', self.nameTk(), self.nameEn(), opt.item, 'places', 'ばしょ', null, true);
+        }
+      });
+      return;
+    }
+
+    if (name === 'withWho') {
+      this.ask({
+        q: J(this.nameTk(), 'は だれと 行[い]きましたか。'),
+        qEn: 'Who did ' + this.nameEn() + ' go with?',
+        options: this.options('people', 4, [this.st.hero]).map(function (it) {
+          return { item: it, icon: D.guessIcon(it, 'people'), tk: tk(it), en: it.e };
+        }),
+        onPick: function (opt) {
+          self.st.companion = opt.item;
+          self.st.mood = 'happy';
+          self.say(J(self.nameTk(), 'は ', tk(opt.item), 'と 行[い]きました。'),
+            self.nameEn() + ' went with the ' + (opt.item.e || opt.item.w) + '.',
+            { who: 'narrator', icon: opt.icon, sfx: 'flip' });
+          self.round('wentWith', self.nameTk(), self.nameEn(), opt.item, 'people', 'だれと', null, true);
+        }
+      });
+      return;
+    }
+
+    if (name === 'activity') {
+      this.ask({
+        q: J(this.nameTk(), 'は そこで 何[なに]を しましたか。'),
+        qEn: 'What did ' + this.nameEn() + ' do there?',
+        options: this.options('actions', 4).map(function (it) {
+          var past = toPast(it);
+          return { item: it, icon: D.guessIcon(it, 'actions'), tk: tk(past), en: past.e };
+        }),
+        onPick: function (opt) {
+          self.st.activity = opt.item;
+          self.st.mood = 'happy';
+          var past = toPast(opt.item);
+          self.say(J(self.nameTk(), 'は そこで ', tk(past), '。'),
+            self.nameEn() + ' ' + (past.e || past.w) + ' there.',
+            { who: 'narrator', icon: D.guessIcon(opt.item, 'actions'), sfx: 'flip' });
+          self.roundConverted('did', self.nameTk(), self.nameEn(), opt.item, 'actions', 'どうし', toPast, true);
+
+          /* Combined recall: "where did that happen" ties the place from
+           * the previous beat back to the activity just chosen, rather
+           * than repeating either fact alone. */
+          var wrongPlaces = self.options('places', 2, [self.st.went]);
+          var placeChoices = JP.shuffle(wrongPlaces.map(function (p) {
+            return { tk: tk(p), icon: D.guessIcon(p, 'places'), correct: false };
+          }).concat([{ tk: tk(self.st.went), icon: D.guessIcon(self.st.went, 'places'), correct: true }]));
+          self.drill([{
+            type: 'wh',
+            prompt: R.parse('どこで しましたか。'),
+            en: 'Where did that happen?',
+            choices: placeChoices,
+            echo: J(tk(self.st.went), 'で ', tk(past), '。'),
+            focus: self.st.went
+          }], 'ばしょ＋どうし');
+        }
+      });
+      return;
+    }
+
+    if (name === 'obstacle') {
+      var twists = JP.shuffle(D.WEEKEND_TWISTS).slice(0, 3);
+      this.ask({
+        q: R.parse('でも、何[なに]が おきましたか。'),
+        qEn: 'But what happened?',
+        options: twists.map(function (c) {
+          return { twist: c, icon: c.icon, tk: R.parse(c.ja), en: c.en };
+        }),
+        onPick: function (o) {
+          self.st.twist = o.twist;
+          self.st.mood = 'surprised';
+          self.say(R.parse(o.twist.ja), o.twist.en,
+            { who: 'narrator', mood: 'surprised', icon: o.twist.icon, sfx: 'oops' });
+          self.drill([{
+            type: 'yn',
+            prompt: R.parse('たいへんでしたか。'),
+            en: 'Was that a problem?',
+            choices: [
+              { tk: R.parse('はい、そうです'), icon: '⭕', correct: true },
+              { tk: R.parse('いいえ、ちがいます'), icon: '❌', correct: false }
+            ],
+            echo: R.parse('はい、たいへんでした。'),
+            focus: null
+          }], 'もんだい');
+        }
+      });
+      return;
+    }
+
+    if (name === 'resolution') {
+      var resolutions = JP.shuffle(D.WEEKEND_RESOLUTIONS).slice(0, 3);
+      this.ask({
+        q: R.parse('それから、どう しましたか。'),
+        qEn: 'Then, what did they do?',
+        options: resolutions.map(function (c) {
+          return { resolution: c, icon: c.icon, tk: R.parse(c.ja), en: c.en };
+        }),
+        onPick: function (o) {
+          self.st.resolution = o.resolution;
+          self.st.mood = 'happy';
+          self.say(R.parse(o.resolution.ja), o.resolution.en,
+            { who: 'narrator', icon: o.resolution.icon, sfx: 'flip' });
+          self.drill([{
+            type: 'yn',
+            prompt: R.parse('げんきに なりましたか。'),
+            en: 'Did things get better?',
+            choices: [
+              { tk: R.parse('はい、そうです'), icon: '⭕', correct: true },
+              { tk: R.parse('いいえ、ちがいます'), icon: '❌', correct: false }
+            ],
+            echo: R.parse('はい、げんきに なりました。'),
+            focus: null
+          }], 'かいけつ');
+        }
+      });
+      return;
+    }
+
+    if (name === 'outcome') {
+      var cards = JP.shuffle(D.WEEKEND_OUTCOMES).slice(0, 3);
+      this.ask({
+        q: R.parse('さいごに、どう なりましたか。'),
+        qEn: 'How did it turn out in the end?',
+        options: cards.map(function (c) {
+          return { ending: c, icon: c.icon, tk: R.parse(c.ja), en: c.en };
+        }),
+        onPick: function (o) {
+          var c = o.ending;
+          self.st.ending = c;
+          self.st.mood = c.kind === 'happy' ? 'excited' : 'surprised';
+          self.say(R.parse(c.ja), c.en,
+            { who: 'narrator', mood: self.st.mood, icon: c.icon, sfx: c.kind === 'happy' ? 'win' : 'oops' });
+          self.drill([{
+            type: 'yn',
+            prompt: R.parse('たのしい 週末[しゅうまつ]でしたか。'),
+            en: 'Was it a fun weekend overall?',
+            choices: [
+              { tk: R.parse('はい、そうです'), icon: '⭕', correct: c.kind === 'happy' },
+              { tk: R.parse('いいえ、ちがいます'), icon: '❌', correct: c.kind !== 'happy' }
+            ],
+            echo: c.kind === 'happy'
+              ? R.parse('はい、たのしい 週末[しゅうまつ]でした。')
+              : R.parse('いいえ、たいへんな 週末[しゅうまつ]でした。'),
+            focus: null
+          }], 'まとめ');
+        }
+      });
+      return;
+    }
+
+    if (name === 'feeling') {
+      this.ask({
+        q: J(this.nameTk(), 'は どう 思[おも]いましたか。'),
+        qEn: 'What did ' + this.nameEn() + ' think about it all?',
+        options: this.options('feelings', 4, [], true).map(function (it) {
+          return { item: it, icon: D.guessIcon(it, 'feelings'), tk: tk(it), en: it.e };
+        }),
+        onPick: function (opt) {
+          self.st.feeling = opt.item;
+          self.st.mood = D.moodFor(opt.item);
+          self.say(J(self.nameTk(), 'は 「', tk(opt.item), '」と 思[おも]いました。'),
+            self.nameEn() + ' thought, "It was ' + (opt.item.e || opt.item.w) + '."',
+            { who: 'hero', mood: self.st.mood, icon: opt.icon });
+          self.round('thought', self.nameTk(), self.nameEn(), opt.item, 'feelings', 'きもち', null, true);
+          self.say(R.parse('おしまい。'), 'The end.', { who: 'chapter', mood: self.st.mood, sfx: 'win' });
+        }
+      });
+      return;
+    }
+
+    if (name === 'recap') {
+      this.steps.push({ kind: 'recap', scene: this.scene(), mood: this.st.mood || 'happy', props: this.props() });
       return;
     }
   };
